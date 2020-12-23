@@ -57,7 +57,6 @@ def nRF5_binary(
         name = name + "_out",
         srcs = srcs + [
             paths.join(sdk_config_prefix, "sdk_config.h"),
-            "@nRF5//:srcs",
         ],
         copts = copts + nRF5_copts,
         # TODO: Find a better way to add board defines
