@@ -1,25 +1,33 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "sdk",
-    # TODO: Find a better way to add soft devices
-    srcs = glob(include=[
-        "components/softdevice/common/*.h",
-        "components/softdevice/s140/headers/*.h",
-    ]) + glob(include = [
-        "components/libraries/**/*.c",
-        "components/boards/*.c",
-        "external/fprintf/*.c",
-    ], exclude = [
-        "components/libraries/bootloader/**/*"
-    ]) + [
+filegroup(
+    name = "srcs",
+    srcs = [
+        "modules/nrfx/mdk/gcc_startup_nrf52.S",
+        "components/libraries/log/src/nrf_log_frontend.c",
+        "components/libraries/log/src/nrf_log_str_formatter.c",
+        "components/boards/boards.c",
+        "components/libraries/util/app_error.c",
+        "components/libraries/util/app_error_handler_gcc.c",
+        "components/libraries/util/app_error_weak.c",
+        "components/libraries/util/app_util_platform.c",
+        "components/libraries/util/nrf_assert.c",
+        "components/libraries/atomic/nrf_atomic.c",
+        "components/libraries/balloc/nrf_balloc.c",
+        "external/fprintf/nrf_fprintf.c",
+        "external/fprintf/nrf_fprintf_format.c",
+        "components/libraries/memobj/nrf_memobj.c",
+        "components/libraries/ringbuf/nrf_ringbuf.c",
+        "components/libraries/strerror/nrf_strerror.c",
         "modules/nrfx/soc/nrfx_atomic.c",
+        "modules/nrfx/mdk/system_nrf52.c",
     ],
-    # TODO: Find a better way to add soft devices
-    hdrs = glob(include=[
-        "components/softdevice/common/*.h",
-        "components/softdevice/s140/headers/*.h",
-    ]) + glob([
+)
+
+cc_library(
+    name = "hdrs",
+    srcs = [],
+    hdrs = glob([
         "components/libraries/**/*.h",
         "modules/nrfx/*.h",
         "components/*.h",
@@ -31,10 +39,7 @@ cc_library(
         "modules/nrfx/mdk/*.h",
         "integration/nrfx/**/*.h",
         "external/fprintf/*.h",
-    # TODO: Find a better way to add SDK config
-    ]) + [
-        "examples/peripheral/blinky/pca10040/blank/config/sdk_config.h",
-    ],
+    ]),
     # TODO: Find a better way to add board defines
     defines = [
         "BOARD_PCA10040",
@@ -49,13 +54,9 @@ cc_library(
         "__HEAP_SIZE=8192",
         "__STACK_SIZE=8192",
     ],
-    # TODO: Find a better way to add soft devices
-    includes = [
-        "components/softdevice/common",
-        "components/softdevice/s140/headers",
-    ] + glob(include=[
+    includes = glob(include = [
         "components/libraries/*",
-    ], exclude_directories=0) + [
+    ], exclude_directories = 0) + [
         "components",
         "components/boards",
         "components/drivers_nrf/nrf_soc_nosd",
@@ -67,18 +68,9 @@ cc_library(
         "modules/nrfx/mdk",
         "integration/nrfx",
         "external/fprintf",
-        # TODO: Find a better way to add SDK config
-        "examples/peripheral/blinky/pca10040/blank/config",
     ],
-    copts = [
-        "-O3",
-        "-g3",
-        "-mcpu=cortex-m4",
-        "-mthumb -mabi=aapcs",
-        "-Wall -Werror",
-        "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
-        "-ffunction-sections -fdata-sections -fno-strict-aliasing",
-        "-fno-builtin -fshort-enums",
+    deps = [
+        "modules/nrfx/mdk/nrf_common.ld",
     ],
     linkopts = [
         "-O3 -g3",
@@ -88,10 +80,8 @@ cc_library(
         "-Wl,--gc-sections",
         "--specs=nano.specs",
         "-lc -lnosys -lm",
+        "-L $(location modules/nrfx/mdk)",
     ],
-    deps = [],
+    data = ["modules/nrfx/mdk"],
 )
 
-
-#  $(PROJ_DIR) \
-#  ../config \
