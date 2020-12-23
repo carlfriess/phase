@@ -4,8 +4,8 @@ cc_library(
     name = "GC9A01",
     srcs = glob(["GC9A01/*.c"]),
     hdrs = glob(["GC9A01/*.h"]),
-    includes = ["GC9A01"],
     copts = nRF5_copts,
+    includes = ["GC9A01"],
     linkopts = nRF5_linkopts,
     visibility = ["//visibility:public"],
 )

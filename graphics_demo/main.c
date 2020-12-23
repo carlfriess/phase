@@ -59,6 +59,8 @@ int main(void)
 
     GC9A01_init();
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
     while (1) {
 
         uint8_t color[3];
@@ -148,5 +150,6 @@ int main(void)
         nrf_delay_ms(1000);
 
     }
+#pragma clang diagnostic pop
     
 }
