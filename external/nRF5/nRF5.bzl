@@ -65,7 +65,12 @@ def nRF5_binary(
             "BOARD_PCA10040",
             "NRF52832_XXAA",
             "NRF52",
+            "NRF52832_XXAA",
             "NRF52_PAN_74",
+        ] + [
+            "NRF_SD_BLE_API_VERSION=7",
+            "S132",
+            "SOFTDEVICE_PRESENT",
         ] + [
             "APP_TIMER_V2",
             "APP_TIMER_V2_RTC1_ENABLED",
