@@ -1,5 +1,26 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+nRF5_copts = [
+    "-O3",
+    "-g3",
+    "-mcpu=cortex-m4",
+    "-mthumb -mabi=aapcs",
+    "-Wall",
+    "-Werror",
+    "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
+    "-ffunction-sections -fdata-sections -fno-strict-aliasing",
+    "-fno-builtin -fshort-enums",
+]
+
+nRF5_linkopts = [
+    "-O3 -g3",
+    "-mthumb -mabi=aapcs",
+    "-mcpu=cortex-m4",
+    "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
+    "-Wl,--gc-sections",
+    "-lc -lnosys -lm",
+]
+
 def nRF5_binary(
         name = None,
         srcs = [],
@@ -38,17 +59,7 @@ def nRF5_binary(
             paths.join(sdk_config_prefix, "sdk_config.h"),
             "@nRF5//:srcs",
         ],
-        copts = copts + [
-            "-O3",
-            "-g3",
-            "-mcpu=cortex-m4",
-            "-mthumb -mabi=aapcs",
-            "-Wall",
-            "-Werror",
-            "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
-            "-ffunction-sections -fdata-sections -fno-strict-aliasing",
-            "-fno-builtin -fshort-enums",
-        ],
+        copts = copts + nRF5_copts,
         # TODO: Find a better way to add board defines
         defines = defines + [
             "BOARD_PCA10040",
@@ -66,15 +77,8 @@ def nRF5_binary(
         includes = includes + [
             sdk_config_prefix,
         ],
-        linkopts = linkopts + [
-            "-O3 -g3",
-            "-mthumb -mabi=aapcs",
-            "-mcpu=cortex-m4",
-            "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
-            "-Wl,--gc-sections",
+        linkopts = linkopts + nRF5_linkopts + [
             "--specs=nano.specs",
-            "-lc -lnosys -lm",
-        ] + [
             "-T$(location {})".format(linker_cmd),
         ],
         deps = deps + [
