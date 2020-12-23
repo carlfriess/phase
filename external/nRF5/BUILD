@@ -49,18 +49,18 @@ filegroup(
 filegroup(
     name = "hdrs",
     srcs = glob([
-        "components/libraries/**/*.h",
-        "modules/nrfx/*.h",
         "components/*.h",
         "components/boards/*.h",
         "components/drivers_nrf/nrf_soc_nosd/*.h",
+        "components/libraries/**/*.h",
         "components/toolchain/cmsis/include/*.h",
-        "modules/nrfx/**/*.h",
-        "modules/nrfx/hal/*.h",
-        "modules/nrfx/mdk/*.h",
-        "integration/nrfx/**/*.h",
         "external/fprintf/*.h",
         "external/segger_rtt/*.h",
+        "integration/nrfx/**/*.h",
+        "modules/nrfx/**/*.h",
+        "modules/nrfx/*.h",
+        "modules/nrfx/hal/*.h",
+        "modules/nrfx/mdk/*.h",
     ]),
 )
 
@@ -75,14 +75,14 @@ includes = glob(
     "components/drivers_nrf/nrf_soc_nosd",
     "components/libraries/log/src",
     "components/toolchain/cmsis/include",
+    "external/fprintf",
+    "external/segger_rtt",
+    "integration/nrfx",
+    "integration/nrfx/legacy",
     "modules/nrfx",
     "modules/nrfx/drivers/include",
     "modules/nrfx/hal",
     "modules/nrfx/mdk",
-    "integration/nrfx",
-    "integration/nrfx/legacy",
-    "external/fprintf",
-    "external/segger_rtt",
 ]
 
 cc_library(
