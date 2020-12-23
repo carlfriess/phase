@@ -13,7 +13,7 @@ cc_binary(
     ],
     includes = ["config"],
     deps = [
-        "@nRF5//:hdrs",
+        "@nRF5//:sdk",
         "config/blinky_gcc_nrf52.ld",
     ],
 )

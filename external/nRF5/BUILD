@@ -25,7 +25,7 @@ filegroup(
 )
 
 cc_library(
-    name = "hdrs",
+    name = "sdk",
     srcs = [],
     hdrs = glob([
         "components/libraries/**/*.h",
