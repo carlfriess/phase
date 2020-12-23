@@ -2,3 +2,6 @@
 
 # Ignore all bazel-* symlinks
 /bazel-*
+
+# CLion Bazel project
+.clwb
