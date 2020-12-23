@@ -1,0 +1,18 @@
+name: Bazel Actions
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    name: Bazel Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build all
+        run: bazelisk build --platforms=@arm_none_eabi//platforms:arm_none_generic //...:all
