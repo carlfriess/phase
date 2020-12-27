@@ -130,4 +130,14 @@ cc_library(
     ],
 )
 
+config_setting(
+    name = "host_macOS",
+    values = {"host_cpu": "darwin"},
+)
+
+config_setting(
+    name = "host_linux",
+    values = {"host_cpu": "k8"},
+)
+
 exports_files(glob(["**"]))

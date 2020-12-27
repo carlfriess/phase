@@ -39,9 +39,17 @@ http_archive(
 # Nordic nRF command line tools
 
 http_archive(
-    name = "nRF_tools",
+    name = "nRF_tools_macOS",
     build_file = "@//external/nRF_tools:BUILD",
     patch_cmds = ["tar -xvf nRF-Command-Line-Tools_10_12_1.tar"],
     sha256 = "16b4f40beee75ec8d7a6b45b5c1b831a7602dc397791a7439282290d37b2a357",
     url = "https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRF-Command-Line-Tools_10_12_1_OSX.tar",
+)
+
+http_archive(
+    name = "nRF_tools_linux",
+    build_file = "@//external/nRF_tools:BUILD",
+    patch_cmds = ["tar -xvf nRF-Command-Line-Tools_10_12_1.tar"],
+    sha256 = "e1e9dea478e9830463a0e40cbd1179534955ee2d676eadc08fc89e2911692d9b",
+    url = "https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz",
 )

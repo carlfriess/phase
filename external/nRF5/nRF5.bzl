@@ -108,6 +108,15 @@ def nRF5_binary(
         tools = ["@arm_none_eabi//:objcopy"],
     )
 
+    native.alias(
+        name = "mergehex",
+        actual = select({
+            "@nRF5//:host_macOS": "@nRF_tools_macOS//:mergehex",
+            "@nRF5//:host_linux": "@nRF_tools_linux//:mergehex",
+        }),
+        visibility = ["//visibility:private"],
+    )
+
     native.genrule(
         name = name + "_s132_hex",
         srcs = [
@@ -115,8 +124,8 @@ def nRF5_binary(
             "@nRF5//:components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex",
         ],
         outs = [name + "_s132.hex"],
-        cmd = "$(location @nRF_tools//:mergehex) -q -m $(SRCS) -o $(OUTS)",
-        tools = ["@nRF_tools//:mergehex"],
+        cmd = "$(location :mergehex) -q -m $(SRCS) -o $(OUTS)",
+        tools = [":mergehex"],
     )
 
     native.filegroup(
