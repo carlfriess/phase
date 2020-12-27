@@ -51,5 +51,6 @@ http_archive(
     build_file = "@//external/nRF_tools:BUILD",
     patch_cmds = ["tar -xvf nRF-Command-Line-Tools_10_12_1.tar"],
     sha256 = "b99558dd631db7f06fe7cfab0a876d352851bbc1e97015432486588b9caf8184",
+    type = "tar.gz",
     url = "https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz",
 )
