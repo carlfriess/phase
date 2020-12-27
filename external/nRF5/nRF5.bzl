@@ -108,11 +108,23 @@ def nRF5_binary(
         tools = ["@arm_none_eabi//:objcopy"],
     )
 
+    native.genrule(
+        name = name + "_s132_hex",
+        srcs = [
+            ":" + name + "_hex",
+            "@nRF5//:components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex",
+        ],
+        outs = [name + "_s132.hex"],
+        cmd = "$(location @nRF_tools//:mergehex) -q -m $(SRCS) -o $(OUTS)",
+        tools = ["@nRF_tools//:mergehex"],
+    )
+
     native.filegroup(
         name = name,
         srcs = [
             name + "_out",
             name + "_bin",
             name + "_hex",
+            name + "_s132_hex",
         ],
     )
