@@ -35,9 +35,7 @@ void GC9A01_set_chip_select(uint8_t val) {
 
 void GC9A01_spi_tx(uint8_t *data, size_t len) {
     spi_tx(data, len);
-    while (!spi_done()) {
-        __WFE();
-    }
+    while (!spi_done()) ;
 }
 
 void GC9A01_delay(uint16_t ms) {
