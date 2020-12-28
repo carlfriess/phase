@@ -26,7 +26,7 @@ void GC9A01_set_data_command(uint8_t val) {
 }
 
 void GC9A01_set_chip_select(uint8_t val) {
-    // The SPI driver already takes care of the CS signal
+    nrf_gpio_pin_write(GC9A01_CS, val);
 }
 
 void GC9A01_spi_tx(uint8_t *data, size_t len) {
@@ -49,8 +49,9 @@ int main(void)
 
     nrf_gpio_cfg_output(GC9A01_RES);
     nrf_gpio_cfg_output(GC9A01_DC);
+    nrf_gpio_cfg_output(GC9A01_CS);
 
-    spi_init(GC9A01_SCL, GC9A01_SDA, GC9A01_CS);
+    spi_init(GC9A01_SCL, GC9A01_SDA);
 
     NRF_LOG_INFO("SPI example started.");
 

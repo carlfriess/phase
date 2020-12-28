@@ -42,7 +42,7 @@ static void timer_event_handler(nrf_timer_event_t event_type, void *p_context) {
     }
 }
 
-void spi_init(uint8_t sck, uint8_t mosi, uint8_t cs) {
+void spi_init(uint8_t sck, uint8_t mosi) {
 
     ret_code_t err;
     uint32_t spi_end_event;
@@ -55,7 +55,6 @@ void spi_init(uint8_t sck, uint8_t mosi, uint8_t cs) {
     nrfx_spim_config_t spi_config = NRFX_SPIM_DEFAULT_CONFIG;
     spi_config.sck_pin = sck;
     spi_config.mosi_pin = mosi;
-    spi_config.ss_pin = cs;
     spi_config.frequency = NRF_SPIM_FREQ_8M;
     err = nrfx_spim_init(&spi, &spi_config, spi_event_handler, NULL);
     APP_ERROR_CHECK(err);
