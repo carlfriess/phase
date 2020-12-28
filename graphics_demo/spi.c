@@ -22,7 +22,10 @@ static bool spi_xfer_done = true;
 
 static void spi_event_handler(const nrfx_spim_evt_t *p_event, void *pVoid) {
     if (p_event->type == NRFX_SPIM_EVENT_DONE) {
-        // Nothing left to do...
+
+        // Set the flag
+        spi_xfer_done = true;
+
     }
 }
 
@@ -106,6 +109,14 @@ void spi_tx(const uint8_t *data, size_t len) {
 
     // Clear flag
     spi_xfer_done = false;
+
+    // Use a simple transfer if the buffer is small enough
+    if (len <= 0xFF) {
+        nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_XFER_TX(data, len);
+        err = nrfx_spim_xfer(&spi, &xfer, 0);
+        APP_ERROR_CHECK(err);
+        return;
+    }
 
     // Configure timer to stop SPI after appropriate number of transfers
     nrfx_timer_extended_compare(&timer, NRF_TIMER_CC_CHANNEL0, len,
