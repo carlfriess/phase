@@ -45,7 +45,49 @@ void GC9A01_delay(uint16_t ms) {
 static void timer_event_handler(nrf_timer_event_t event_type, void *p_context) {
 }
 
-static uint8_t buf[240*24*3];
+#define CHUNK_SIZE  24
+
+static uint8_t buf1[240*CHUNK_SIZE*3];
+static uint8_t buf2[240*CHUNK_SIZE*3];
+static uint8_t *bufs[] = { buf1, buf2 };
+
+static void swap_bufs(void) {
+    uint8_t *tmp = bufs[1];
+    bufs[1] = bufs[0];
+    bufs[0] = tmp;
+}
+
+static void rainbow(uint8_t *buf, int startX, int endX) {
+    uint8_t color[3];
+    uint16_t i = 0;
+    float frequency = 0.026f;
+    for (int x = startX; x < endX; x++) {
+        color[0] = sin(frequency*x + 0) * 127 + 128;
+        color[1] = sin(frequency*x + 2) * 127 + 128;
+        color[2] = sin(frequency*x + 4) * 127 + 128;
+        for (int y = 0; y < 240; y++) {
+            memcpy(buf + i, color, sizeof(color));
+            i += 3;
+        }
+    }
+}
+
+static void checkerboard(uint8_t *buf, int startX, int endX) {
+    uint16_t i = 0;
+    for (int x = startX; x < endX; x++) {
+        for (int y = 0; y < 240; y++) {
+            if ((x / 10) % 2 ==  (y / 10) % 2) {
+                buf[i++] = 0xFF;
+                buf[i++] = 0xFF;
+                buf[i++] = 0xFF;
+            } else {
+                buf[i++] = 0x00;
+                buf[i++] = 0x00;
+                buf[i++] = 0x00;
+            }
+        }
+    }
+}
 
 int main(void) {
 
@@ -94,8 +136,8 @@ int main(void) {
     // Fill screen chunk by chunk benchmark
     nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
     GC9A01_start_write();
-    for (size_t x = 240*240*3; x > 0; x -= sizeof(buf)) {
-            GC9A01_spi_tx(buf, sizeof(buf));
+    for (size_t x = 240*240*3; x > 0; x -= sizeof(buf1)) {
+            GC9A01_spi_tx(buf1, sizeof(buf1));
     }
     GC9A01_finish_write();
     nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
@@ -118,6 +160,7 @@ int main(void) {
         // Triangle
         color[0] = 0xFF;
         color[1] = 0xFF;
+        GC9A01_start_write();
         for (int x = 0; x < 240; x++) {
             for (int y = 0; y < 240; y++) {
                 if (x < y) {
@@ -125,60 +168,48 @@ int main(void) {
                 } else {
                     color[2] = 0x00;
                 }
-                if (x == 0 && y == 0) {
-                    GC9A01_write(color, sizeof(color));
-                } else {
-                    GC9A01_write_continue(color, sizeof(color));
-                }
+                GC9A01_spi_tx(color, sizeof(color));
             }
         }
+        GC9A01_finish_write();
 
         nrf_delay_ms(1000);
 
         // Rainbow
-        float frequency = 0.026;
-        for (int x = 0; x < 240; x++) {
-            color[0] = sin(frequency*x + 0) * 127 + 128;
-            color[1] = sin(frequency*x + 2) * 127 + 128;
-            color[2] = sin(frequency*x + 4) * 127 + 128;
-            for (int y = 0; y < 240; y++) {
-                if (x == 0 && y == 0) {
-                    GC9A01_write(color, sizeof(color));
-                } else {
-                    GC9A01_write_continue(color, sizeof(color));
-                }
+        GC9A01_start_write();
+        for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
+            if (x > 0) {
+                spi_tx(bufs[0], sizeof(buf1));
             }
+            if (x < 240) {
+                rainbow(bufs[1], x, x + CHUNK_SIZE);
+            }
+            while (!spi_done());
+            swap_bufs();
         }
+        GC9A01_finish_write();
 
         nrf_delay_ms(1000);
 
         // Checkerboard
-        for (int x = 0; x < 240; x++) {
-            color[0] = sin(frequency*x + 0) * 127 + 128;
-            color[1] = sin(frequency*x + 2) * 127 + 128;
-            color[2] = sin(frequency*x + 4) * 127 + 128;
-            for (int y = 0; y < 240; y++) {
-                if ((x / 10) % 2 ==  (y / 10) % 2) {
-                    color[0] = 0xFF;
-                    color[1] = 0xFF;
-                    color[2] = 0xFF;
-                } else {
-                    color[0] = 0x00;
-                    color[1] = 0x00;
-                    color[2] = 0x00;
-                }
-                if (x == 0 && y == 0) {
-                    GC9A01_write(color, sizeof(color));
-                } else {
-                    GC9A01_write_continue(color, sizeof(color));
-                }
+        GC9A01_start_write();
+        for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
+            if (x > 0) {
+                spi_tx(bufs[0], sizeof(buf1));
             }
+            if (x < 240) {
+                checkerboard(bufs[1], x, x + CHUNK_SIZE);
+            }
+            while (!spi_done());
+            swap_bufs();
         }
+        GC9A01_finish_write();
 
         nrf_delay_ms(1000);
 
         // Swiss flag
         color[0] = 0xFF;
+        GC9A01_start_write();
         for (int x = 0; x < 240; x++) {
             for (int y = 0; y < 240; y++) {
                 if ((x >= 1*48 && x < 4*48 && y >= 2*48 && y < 3*48) ||
@@ -189,13 +220,10 @@ int main(void) {
                     color[1] = 0x00;
                     color[2] = 0x00;
                 }
-                if (x == 0 && y == 0) {
-                    GC9A01_write(color, sizeof(color));
-                } else {
-                    GC9A01_write_continue(color, sizeof(color));
-                }
+                GC9A01_spi_tx(color, sizeof(color));
             }
         }
+        GC9A01_finish_write();
 
         nrf_delay_ms(1000);
 
