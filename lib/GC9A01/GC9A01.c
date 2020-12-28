@@ -314,3 +314,15 @@ void GC9A01_write_continue(uint8_t *data, size_t len) {
     GC9A01_write_command(MEM_WR_CONT);
     GC9A01_write_data(data, len);
 }
+
+void GC9A01_start_write(void) {
+    uint8_t cmd = MEM_WR;
+    GC9A01_set_data_command(0);
+    GC9A01_set_chip_select(0);
+    GC9A01_spi_tx(&cmd, sizeof(cmd));
+    GC9A01_set_data_command(1);
+}
+
+void GC9A01_finish_write(void) {
+    GC9A01_set_chip_select(1);
+}
