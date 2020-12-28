@@ -118,8 +118,14 @@ void spi_tx(const uint8_t *data, size_t len) {
         return;
     }
 
+    // Calculate length split
+    uint8_t zero_bits = __builtin_ctz(len);
+    zero_bits = zero_bits > 7 ? 7 : zero_bits;
+    uint8_t spi_len = 1u << zero_bits;
+    size_t timer_len = len >> zero_bits;
+
     // Configure timer to stop SPI after appropriate number of transfers
-    nrfx_timer_extended_compare(&timer, NRF_TIMER_CC_CHANNEL0, len,
+    nrfx_timer_extended_compare(&timer, NRF_TIMER_CC_CHANNEL0, timer_len,
                                 NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK, true);
 
     // Enable the shortcut causing the SPI transfer to loop and ppi channel used to count iterations
@@ -127,7 +133,7 @@ void spi_tx(const uint8_t *data, size_t len) {
     nrf_ppi_channel_enable(ppi_channel_spi);
 
     // Start the transfer in repeat mode
-    nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_XFER_TX(data, 1);
+    nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_XFER_TX(data, spi_len);
     err = nrfx_spim_xfer(&spi, &xfer, NRFX_SPIM_FLAG_REPEATED_XFER |
                                       NRFX_SPIM_FLAG_TX_POSTINC |
                                       NRFX_SPIM_FLAG_NO_XFER_EVT_HANDLER);
