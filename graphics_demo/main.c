@@ -1,6 +1,5 @@
 #include <math.h>
 
-#include "nrf_drv_spi.h"
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
 #include "boards.h"
@@ -9,29 +8,32 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
+#include "spi.h"
 #include "GC9A01.h"
 
-#define SPI_INSTANCE  0 /**< SPI instance index. */
-static const nrf_drv_spi_t spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);  /**< SPI instance. */
-
-#define RES 11  // P0.11
-#define DC  12  // P0.12
-#define CS  13  // P0.13
+#define GC9A01_SCL  SPI_SCK_PIN
+#define GC9A01_SDA  SPI_MOSI_PIN
+#define GC9A01_RES  3   // P0.03
+#define GC9A01_DC   4   // P0.04
+#define GC9A01_CS   SPI_SS_PIN
 
 void GC9A01_set_reset(uint8_t val) {
-    nrf_gpio_pin_write(RES, val);
+    nrf_gpio_pin_write(GC9A01_RES, val);
 }
 
 void GC9A01_set_data_command(uint8_t val) {
-    nrf_gpio_pin_write(DC, val);
+    nrf_gpio_pin_write(GC9A01_DC, val);
 }
 
 void GC9A01_set_chip_select(uint8_t val) {
-    // The SPIM driver already takes care of the CS signal
+    // The SPI driver already takes care of the CS signal
 }
 
 void GC9A01_spi_tx(uint8_t *data, size_t len) {
-    nrf_drv_spi_transfer(&spi, data, len, NULL, 0);
+    spi_tx(data, len);
+    while (!spi_done()) {
+        __WFE();
+    }
 }
 
 void GC9A01_delay(uint16_t ms) {
@@ -45,15 +47,10 @@ int main(void)
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 
-    nrf_gpio_cfg_output(RES);
-    nrf_gpio_cfg_output(DC);
+    nrf_gpio_cfg_output(GC9A01_RES);
+    nrf_gpio_cfg_output(GC9A01_DC);
 
-    nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
-    spi_config.ss_pin   = CS;
-    spi_config.miso_pin = SPI_MISO_PIN; // P0.30
-    spi_config.mosi_pin = SPI_MOSI_PIN; // P0.29
-    spi_config.sck_pin  = SPI_SCK_PIN;  // P0.26
-    APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, NULL, NULL));
+    spi_init(GC9A01_SCL, GC9A01_SDA, GC9A01_CS);
 
     NRF_LOG_INFO("SPI example started.");
 

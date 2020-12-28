@@ -1,8 +1,7 @@
 load("@//external/nRF5:nRF5.bzl", "nRF5_binary")
 
 nRF5_binary(
-    srcs = [
-        "main.c",
+    srcs = glob(["*.c", "*.h"]) + [
         "@nRF5//:components/boards/boards.c",
         "@nRF5//:components/libraries/atomic/nrf_atomic.c",
         "@nRF5//:components/libraries/atomic_fifo/nrf_atfifo.c",
@@ -32,11 +31,12 @@ nRF5_binary(
         "@nRF5//:external/segger_rtt/SEGGER_RTT.c",
         "@nRF5//:external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c",
         "@nRF5//:external/segger_rtt/SEGGER_RTT_printf.c",
-        "@nRF5//:integration/nrfx/legacy/nrf_drv_spi.c",
         "@nRF5//:integration/nrfx/legacy/nrf_drv_uart.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_gpiote.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_spi.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_spim.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_ppi.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_timer.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_uart.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_uarte.c",
         "@nRF5//:modules/nrfx/drivers/src/prs/nrfx_prs.c",
