@@ -149,8 +149,6 @@ int main(void) {
     NRF_LOG_INFO("Theoretical min: %d us", 173520);
     NRF_LOG_FLUSH();
 
-    NRF_LOG_INFO("SPI example started.");
-
     GC9A01_init();
 
     while (1) {
@@ -176,6 +174,7 @@ int main(void) {
         nrf_delay_ms(1000);
 
         // Rainbow
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
         GC9A01_start_write();
         for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
             if (x > 0) {
@@ -188,10 +187,16 @@ int main(void) {
             swap_bufs();
         }
         GC9A01_finish_write();
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
+        start = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL0);
+        stop = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL1);
+        NRF_LOG_INFO("Rainbow: %d us", stop - start);
+        NRF_LOG_FLUSH();
 
         nrf_delay_ms(1000);
 
         // Checkerboard
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
         GC9A01_start_write();
         for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
             if (x > 0) {
@@ -204,10 +209,16 @@ int main(void) {
             swap_bufs();
         }
         GC9A01_finish_write();
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
+        start = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL0);
+        stop = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL1);
+        NRF_LOG_INFO("Checkerboard: %d us", stop - start);
+        NRF_LOG_FLUSH();
 
         nrf_delay_ms(1000);
 
         // Swiss flag
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
         color[0] = 0xFF;
         GC9A01_start_write();
         for (int x = 0; x < 240; x++) {
@@ -224,6 +235,11 @@ int main(void) {
             }
         }
         GC9A01_finish_write();
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
+        start = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL0);
+        stop = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL1);
+        NRF_LOG_INFO("Swiss flag: %d us", stop - start);
+        NRF_LOG_FLUSH();
 
         nrf_delay_ms(1000);
 
