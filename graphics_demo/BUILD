@@ -1,14 +1,9 @@
 load("@//external/nRF5:nRF5.bzl", "nRF5_binary")
+load("@//tools/img:embed.bzl", "embed_img")
 
-genrule(
-    name = "background_img",
-    srcs = [
-        "//tools/img:template.c",
-        "background.jpeg",
-    ],
-    outs = ["background.c"],
-    cmd = "./$(location //tools/img:embed) $(OUTS) $(SRCS)",
-    tools = ["//tools/img:embed"],
+embed_img(
+    name = "image",
+    img = "image.jpeg",
 )
 
 nRF5_binary(
@@ -16,7 +11,7 @@ nRF5_binary(
         "*.c",
         "*.h",
     ]) + [
-        ":background_img",
+        ":image",
         "@nRF5//:components/boards/boards.c",
         "@nRF5//:components/libraries/atomic/nrf_atomic.c",
         "@nRF5//:components/libraries/atomic_fifo/nrf_atfifo.c",

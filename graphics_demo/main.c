@@ -21,7 +21,7 @@
 #define TIMER_INSTANCE  2   // Timer instance index
 static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(TIMER_INSTANCE);
 
-extern const uint8_t background[];
+extern const uint8_t image[];
 
 void GC9A01_set_reset(uint8_t val) {
     nrf_gpio_pin_write(GC9A01_RES, val);
@@ -165,7 +165,7 @@ int main(void) {
                 spi_tx(bufs[0], sizeof(buf1));
             }
             if (x < 240) {
-                memcpy(bufs[1], background + 240*3*x, sizeof(buf1));
+                memcpy(bufs[1], image + 240 * 3 * x, sizeof(buf1));
             }
             swap_bufs();
             while (!spi_done());
