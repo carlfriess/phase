@@ -3,5 +3,6 @@
 # Ignore all bazel-* symlinks
 /bazel-*
 
-# CLion Bazel project
+# CLion/GoLand Bazel project
 .clwb
+.ijwb
