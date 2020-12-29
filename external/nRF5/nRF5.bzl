@@ -109,7 +109,7 @@ def nRF5_binary(
     )
 
     native.alias(
-        name = "mergehex",
+        name = name + "_mergehex",
         actual = select({
             "@nRF5//:host_macOS": "@nRF_tools_macOS//:mergehex",
             "@nRF5//:host_linux": "@nRF_tools_linux//:mergehex",
@@ -124,8 +124,8 @@ def nRF5_binary(
             "@nRF5//:components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex",
         ],
         outs = [name + "_s132.hex"],
-        cmd = "$(location :mergehex) -q -m $(SRCS) -o $(OUTS)",
-        tools = [":mergehex"],
+        cmd = "$(location :" + name + "_mergehex) -q -m $(SRCS) -o $(OUTS)",
+        tools = [":" + name + "_mergehex"],
     )
 
     native.filegroup(
