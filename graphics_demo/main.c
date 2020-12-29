@@ -21,6 +21,8 @@
 #define TIMER_INSTANCE  2   // Timer instance index
 static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(TIMER_INSTANCE);
 
+extern const uint8_t background[];
+
 void GC9A01_set_reset(uint8_t val) {
     nrf_gpio_pin_write(GC9A01_RES, val);
 }
@@ -155,6 +157,27 @@ int main(void) {
 
         uint8_t color[3];
 
+        // Background image
+        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
+        GC9A01_start_write();
+        for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
+            if (x > 0) {
+                spi_tx(bufs[0], sizeof(buf1));
+            }
+            if (x < 240) {
+                memcpy(bufs[1], background + 240*3*x, sizeof(buf1));
+            }
+            swap_bufs();
+            while (!spi_done());
+        }
+        GC9A01_finish_write();nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
+        start = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL0);
+        stop = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL1);
+        NRF_LOG_INFO("Image: %d us", stop - start);
+        NRF_LOG_FLUSH();
+
+        nrf_delay_ms(1000);
+
         // Triangle
         color[0] = 0xFF;
         color[1] = 0xFF;
@@ -183,8 +206,8 @@ int main(void) {
             if (x < 240) {
                 rainbow(bufs[1], x, x + CHUNK_SIZE);
             }
-            while (!spi_done());
             swap_bufs();
+            while (!spi_done());
         }
         GC9A01_finish_write();
         nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
@@ -205,8 +228,8 @@ int main(void) {
             if (x < 240) {
                 checkerboard(bufs[1], x, x + CHUNK_SIZE);
             }
-            while (!spi_done());
             swap_bufs();
+            while (!spi_done());
         }
         GC9A01_finish_write();
         nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
