@@ -10,11 +10,17 @@ extern "C" {
 
 // Hardware abstraction layer
 // Should be defined by the user of the library
+
 void GC9A01_set_reset(uint8_t val);
+
 void GC9A01_set_data_command(uint8_t val);
+
 void GC9A01_set_chip_select(uint8_t val);
+
 void GC9A01_delay(uint16_t ms);
+
 void GC9A01_spi_tx(uint8_t *data, size_t len);
+
 
 struct GC9A01_point {
     uint16_t X, Y;
@@ -25,10 +31,15 @@ struct GC9A01_frame {
 };
 
 void GC9A01_init(void);
+
 void GC9A01_set_frame(struct GC9A01_frame frame);
+
 void GC9A01_write(uint8_t *data, size_t len);
+
 void GC9A01_write_continue(uint8_t *data, size_t len);
+
 void GC9A01_start_write(void);
+
 void GC9A01_finish_write(void);
 
 #ifdef __cplusplus
