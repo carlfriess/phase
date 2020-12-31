@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 load("@//external/nRF5:nRF5.bzl", "nRF5_copts", "nRF5_linkopts")
 
 cc_library(
@@ -7,5 +9,4 @@ cc_library(
     copts = nRF5_copts,
     includes = ["GC9A01"],
     linkopts = nRF5_linkopts,
-    visibility = ["//visibility:public"],
 )
