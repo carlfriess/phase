@@ -1,6 +1,8 @@
 load("@//external/nRF5:nRF5.bzl", "nRF5_binary")
 load("@//tools/img:embed.bzl", "embed_img")
 
+# Photo by Manuel Will on Unsplash
+# https://unsplash.com/photos/gd3t5Dtbwkw
 embed_img(
     name = "image",
     img = "image.jpeg",
