@@ -9,7 +9,7 @@
 #include "nrf_log_default_backends.h"
 #include "nrfx_timer.h"
 
-#include "spi.h"
+#include "watch/spi.h"
 #include "GC9A01.h"
 
 #define GC9A01_SCL  SPI_SCK_PIN

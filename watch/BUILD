@@ -84,3 +84,11 @@ nRF5_binary(
     linker_cmd = "config/ble_app_cts_c_gcc_nrf52.ld",
     sdk_config_prefix = "config",
 )
+
+exports_files(
+    [
+        "spi.c",
+        "spi.h",
+    ],
+    visibility = ["//graphics_demo:__pkg__"],
+)

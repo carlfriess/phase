@@ -14,6 +14,8 @@ nRF5_binary(
         "*.h",
     ]) + [
         ":image",
+        "//watch:spi.c",
+        "//watch:spi.h",
         "@nRF5//:components/boards/boards.c",
         "@nRF5//:components/libraries/atomic/nrf_atomic.c",
         "@nRF5//:components/libraries/atomic_fifo/nrf_atfifo.c",
