@@ -1,0 +1,53 @@
+//
+// Created by Carl Friess on 01/01/2021.
+//
+
+#ifndef PHASE_PHASE_UI_H
+#define PHASE_PHASE_UI_H
+
+#include <cstdint>
+#include <vector>
+
+namespace phase {
+namespace ui {
+
+typedef int16_t Coord;
+
+typedef uint8_t Color[3];
+
+struct Point {
+    Coord x, y;
+};
+
+struct Frame {
+    Point origin;
+    Coord width, height;
+
+    inline size_t area() const {
+        return width * height;
+    }
+};
+
+class View {
+public:
+    Frame frame;
+    std::vector<View> subviews;
+    bool opaque = true;
+    Color background_color = {0x00, 0x00, 0x00};
+
+    explicit View(Frame frame) : frame(frame) {};
+
+    virtual void render(uint8_t *buffer, Frame frame) const;
+};
+
+class ImageView : View {
+    uint8_t *img;
+
+public:
+    explicit ImageView(uint8_t *img, Frame frame) : View(frame), img(img) {};
+};
+
+}
+}
+
+#endif //PHASE_PHASE_UI_H

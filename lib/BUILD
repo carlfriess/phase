@@ -10,3 +10,12 @@ cc_library(
     includes = ["GC9A01"],
     linkopts = nRF5_linkopts,
 )
+
+cc_library(
+    name = "ui",
+    srcs = glob(["ui/*.cpp"]),
+    hdrs = glob(["ui/**/*.h"]),
+    copts = nRF5_copts,
+    includes = ["ui/include"],
+    linkopts = nRF5_linkopts,
+)
