@@ -1,10 +1,19 @@
 load("@//external/nRF5:nRF5.bzl", "nRF5_binary")
+load("@//tools/img:embed.bzl", "embed_img")
+
+# Photo by Manuel Will on Unsplash
+# https://unsplash.com/photos/gd3t5Dtbwkw
+embed_img(
+    name = "background",
+    img = "background.jpeg",
+)
 
 nRF5_binary(
     srcs = glob([
         "*.c",
         "*.h",
     ]) + [
+        ":background",
         "@nRF5//:components/ble/ble_advertising/ble_advertising.c",
         "@nRF5//:components/ble/ble_db_discovery/ble_db_discovery.c",
         "@nRF5//:components/ble/ble_services/ble_cts_c/ble_cts_c.c",
@@ -74,6 +83,10 @@ nRF5_binary(
         "@nRF5//:integration/nrfx/legacy/nrf_drv_uart.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_clock.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_gpiote.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_spi.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_spim.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_ppi.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_timer.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_uart.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_uarte.c",
         "@nRF5//:modules/nrfx/drivers/src/prs/nrfx_prs.c",
@@ -83,6 +96,9 @@ nRF5_binary(
     ],
     linker_cmd = "config/ble_app_cts_c_gcc_nrf52.ld",
     sdk_config_prefix = "config",
+    deps = [
+        "//lib:GC9A01",
+    ],
 )
 
 exports_files(
