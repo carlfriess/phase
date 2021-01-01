@@ -157,25 +157,33 @@ int main(void) {
 
         uint8_t color[3];
 
-        // Background image
-        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
-        GC9A01_start_write();
-        for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
-            if (x > 0) {
-                spi_tx(bufs[0], 240 * 3 * CHUNK_SIZE);
+        for (size_t chunk = 1; chunk <= CHUNK_SIZE; chunk++) {
+
+            if (240 % chunk) {
+                continue;
             }
-            if (x < 240) {
-                memcpy(bufs[1], image + 240 * 3 * x, 240 * 3 * CHUNK_SIZE);
+
+            // Background image
+            nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL0);
+            GC9A01_start_write();
+            for (int x = 0; x < 240 + 1; x += chunk) {
+                if (x > 0) {
+                    spi_tx(bufs[0], 240 * 3 * chunk);
+                }
+                if (x < 240) {
+                    memcpy(bufs[1], image + 240 * 3 * x, 240 * 3 * chunk);
+                }
+                swap_bufs();
+                while (!spi_done());
             }
-            swap_bufs();
-            while (!spi_done());
+            GC9A01_finish_write();
+            nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
+            start = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL0);
+            stop = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL1);
+            NRF_LOG_INFO("Image (%d): %d us", chunk, stop - start);
+            NRF_LOG_FLUSH();
+
         }
-        GC9A01_finish_write();
-        nrfx_timer_capture(&timer, NRF_TIMER_CC_CHANNEL1);
-        start = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL0);
-        stop = nrfx_timer_capture_get(&timer, NRF_TIMER_CC_CHANNEL1);
-        NRF_LOG_INFO("Image: %d us", stop - start);
-        NRF_LOG_FLUSH();
 
         nrf_delay_ms(1000);
 
