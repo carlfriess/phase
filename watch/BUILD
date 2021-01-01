@@ -96,6 +96,9 @@ nRF5_binary(
         "@nRF5//:modules/nrfx/soc/nrfx_atomic.c",
     ],
     linker_cmd = "config/ble_app_cts_c_gcc_nrf52.ld",
+    linkopts = [
+        "-lstdc++",
+    ],
     sdk_config_prefix = "config",
     deps = [
         "//lib:GC9A01",
