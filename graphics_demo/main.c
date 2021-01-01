@@ -162,10 +162,10 @@ int main(void) {
         GC9A01_start_write();
         for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
             if (x > 0) {
-                spi_tx(bufs[0], sizeof(buf1));
+                spi_tx(bufs[0], 240 * 3 * CHUNK_SIZE);
             }
             if (x < 240) {
-                memcpy(bufs[1], image + 240 * 3 * x, sizeof(buf1));
+                memcpy(bufs[1], image + 240 * 3 * x, 240 * 3 * CHUNK_SIZE);
             }
             swap_bufs();
             while (!spi_done());
