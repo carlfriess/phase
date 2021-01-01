@@ -55,7 +55,7 @@ void GC9A01_delay(uint16_t ms) {
     nrf_delay_ms(ms);
 }
 
-#define CHUNK_SIZE  12
+#define CHUNK_SIZE  8
 
 static uint8_t buf1[240 * CHUNK_SIZE * 3];
 static uint8_t buf2[240 * CHUNK_SIZE * 3];
