@@ -11,6 +11,7 @@
 
 #include "bluetooth.h"
 #include "spi.h"
+#include "ui.h"
 
 extern const uint8_t background[];
 
@@ -55,18 +56,6 @@ void GC9A01_delay(uint16_t ms) {
     nrf_delay_ms(ms);
 }
 
-#define CHUNK_SIZE  8
-
-static uint8_t buf1[240 * CHUNK_SIZE * 3];
-static uint8_t buf2[240 * CHUNK_SIZE * 3];
-static uint8_t *bufs[] = {buf1, buf2};
-
-static void swap_bufs(void) {
-    uint8_t *tmp = bufs[1];
-    bufs[1] = bufs[0];
-    bufs[0] = tmp;
-}
-
 int main(void) {
 
     bool erase_bonds;
@@ -92,20 +81,8 @@ int main(void) {
     nrf_gpio_cfg_output(GC9A01_CS);
     spi_init(GC9A01_SCL, GC9A01_SDA);
     GC9A01_init();
-
-    // Show background image
-    GC9A01_start_write();
-    for (int x = 0; x < 240 + 1; x += CHUNK_SIZE) {
-        if (x > 0) {
-            spi_tx(bufs[0], sizeof(buf1));
-        }
-        if (x < 240) {
-            memcpy(bufs[1], background + 240 * 3 * x, sizeof(buf1));
-        }
-        swap_bufs();
-        while (!spi_done());
-    }
-    GC9A01_finish_write();
+    ui_init();
+    ui_update();
 
     // Start advertising
     advertising_start(erase_bonds);

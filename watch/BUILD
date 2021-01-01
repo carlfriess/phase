@@ -11,6 +11,7 @@ embed_img(
 nRF5_binary(
     srcs = glob([
         "*.c",
+        "*.cpp",
         "*.h",
     ]) + [
         ":background",
@@ -98,6 +99,7 @@ nRF5_binary(
     sdk_config_prefix = "config",
     deps = [
         "//lib:GC9A01",
+        "//lib:ui",
     ],
 )
 
