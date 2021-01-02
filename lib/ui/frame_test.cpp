@@ -13,7 +13,7 @@ TEST(FrameTest, Area) {
             .height = 64,
     };
 
-    ASSERT_EQ(frame.area(), 64 * 64);
+    EXPECT_EQ(frame.area(), 64 * 64);
 
 }
 
@@ -31,28 +31,28 @@ TEST(FrameTest, Overlaps) {
             .height = 10,
     };
 
-    ASSERT_FALSE(frame1.overlaps(frame2));
-    ASSERT_FALSE(frame2.overlaps(frame1));
+    EXPECT_FALSE(frame1.overlaps(frame2));
+    EXPECT_FALSE(frame2.overlaps(frame1));
 
     frame2.origin.x = 10;
 
-    ASSERT_FALSE(frame1.overlaps(frame2));
-    ASSERT_FALSE(frame2.overlaps(frame1));
+    EXPECT_FALSE(frame1.overlaps(frame2));
+    EXPECT_FALSE(frame2.overlaps(frame1));
 
     frame2.origin.x = 0;
 
-    ASSERT_FALSE(frame1.overlaps(frame2));
-    ASSERT_FALSE(frame2.overlaps(frame1));
+    EXPECT_FALSE(frame1.overlaps(frame2));
+    EXPECT_FALSE(frame2.overlaps(frame1));
 
     frame2.origin.y = 5;
 
-    ASSERT_TRUE(frame1.overlaps(frame2));
-    ASSERT_TRUE(frame2.overlaps(frame1));
+    EXPECT_TRUE(frame1.overlaps(frame2));
+    EXPECT_TRUE(frame2.overlaps(frame1));
 
     frame2.origin.y = 0;
 
-    ASSERT_TRUE(frame1.overlaps(frame2));
-    ASSERT_TRUE(frame2.overlaps(frame1));
+    EXPECT_TRUE(frame1.overlaps(frame2));
+    EXPECT_TRUE(frame2.overlaps(frame1));
 
 }
 
@@ -70,35 +70,35 @@ TEST(FrameTest, Contains) {
             .height = 10,
     };
 
-    ASSERT_FALSE(frame1.contains(frame2));
-    ASSERT_FALSE(frame2.contains(frame1));
+    EXPECT_FALSE(frame1.contains(frame2));
+    EXPECT_FALSE(frame2.contains(frame1));
 
     frame2.origin.x = 5;
 
-    ASSERT_FALSE(frame1.contains(frame2));
-    ASSERT_FALSE(frame2.contains(frame1));
+    EXPECT_FALSE(frame1.contains(frame2));
+    EXPECT_FALSE(frame2.contains(frame1));
 
     frame2.origin.x = 0;
 
-    ASSERT_FALSE(frame1.contains(frame2));
-    ASSERT_FALSE(frame2.contains(frame1));
+    EXPECT_FALSE(frame1.contains(frame2));
+    EXPECT_FALSE(frame2.contains(frame1));
 
     frame2.origin.y = 0;
 
-    ASSERT_TRUE(frame1.contains(frame2));
-    ASSERT_TRUE(frame2.contains(frame1));
+    EXPECT_TRUE(frame1.contains(frame2));
+    EXPECT_TRUE(frame2.contains(frame1));
 
     frame2.width = 5;
     frame2.height = 5;
 
-    ASSERT_TRUE(frame1.contains(frame2));
-    ASSERT_FALSE(frame2.contains(frame1));
+    EXPECT_TRUE(frame1.contains(frame2));
+    EXPECT_FALSE(frame2.contains(frame1));
 
     frame2.origin.x = 1;
     frame2.origin.y = 1;
 
-    ASSERT_TRUE(frame1.contains(frame2));
-    ASSERT_FALSE(frame2.contains(frame1));
+    EXPECT_TRUE(frame1.contains(frame2));
+    EXPECT_FALSE(frame2.contains(frame1));
 
 }
 
@@ -117,28 +117,28 @@ TEST(FrameTest, Overlap) {
     };
 
     phase::ui::Frame overlap = frame1.overlap(frame2);
-    ASSERT_EQ(overlap.origin.x, 5);
-    ASSERT_EQ(overlap.origin.y, 5);
-    ASSERT_EQ(overlap.width, 5);
-    ASSERT_EQ(overlap.height, 5);
+    EXPECT_EQ(overlap.origin.x, 5);
+    EXPECT_EQ(overlap.origin.y, 5);
+    EXPECT_EQ(overlap.width, 5);
+    EXPECT_EQ(overlap.height, 5);
     overlap = frame2.overlap(frame1);
-    ASSERT_EQ(overlap.origin.x, 5);
-    ASSERT_EQ(overlap.origin.y, 5);
-    ASSERT_EQ(overlap.width, 5);
-    ASSERT_EQ(overlap.height, 5);
+    EXPECT_EQ(overlap.origin.x, 5);
+    EXPECT_EQ(overlap.origin.y, 5);
+    EXPECT_EQ(overlap.width, 5);
+    EXPECT_EQ(overlap.height, 5);
 
     frame2.origin.x = -5;
 
     overlap = frame1.overlap(frame2);
-    ASSERT_EQ(overlap.origin.x, 0);
-    ASSERT_EQ(overlap.origin.y, 5);
-    ASSERT_EQ(overlap.width, 5);
-    ASSERT_EQ(overlap.height, 5);
+    EXPECT_EQ(overlap.origin.x, 0);
+    EXPECT_EQ(overlap.origin.y, 5);
+    EXPECT_EQ(overlap.width, 5);
+    EXPECT_EQ(overlap.height, 5);
     overlap = frame2.overlap(frame1);
-    ASSERT_EQ(overlap.origin.x, 0);
-    ASSERT_EQ(overlap.origin.y, 5);
-    ASSERT_EQ(overlap.width, 5);
-    ASSERT_EQ(overlap.height, 5);
+    EXPECT_EQ(overlap.origin.x, 0);
+    EXPECT_EQ(overlap.origin.y, 5);
+    EXPECT_EQ(overlap.width, 5);
+    EXPECT_EQ(overlap.height, 5);
 
     frame2.origin.x = 1;
     frame2.origin.y = 1;
@@ -146,20 +146,20 @@ TEST(FrameTest, Overlap) {
     frame2.height = 6;
 
     overlap = frame1.overlap(frame2);
-    ASSERT_EQ(overlap.origin.x, 1);
-    ASSERT_EQ(overlap.origin.y, 1);
-    ASSERT_EQ(overlap.width, 6);
-    ASSERT_EQ(overlap.height, 6);
+    EXPECT_EQ(overlap.origin.x, 1);
+    EXPECT_EQ(overlap.origin.y, 1);
+    EXPECT_EQ(overlap.width, 6);
+    EXPECT_EQ(overlap.height, 6);
     overlap = frame2.overlap(frame1);
-    ASSERT_EQ(overlap.origin.x, 1);
-    ASSERT_EQ(overlap.origin.y, 1);
-    ASSERT_EQ(overlap.width, 6);
-    ASSERT_EQ(overlap.height, 6);
+    EXPECT_EQ(overlap.origin.x, 1);
+    EXPECT_EQ(overlap.origin.y, 1);
+    EXPECT_EQ(overlap.width, 6);
+    EXPECT_EQ(overlap.height, 6);
 
     overlap = frame1.overlap(frame1);
-    ASSERT_EQ(overlap.origin.x, 0);
-    ASSERT_EQ(overlap.origin.y, 0);
-    ASSERT_EQ(overlap.width, 10);
-    ASSERT_EQ(overlap.height, 10);
+    EXPECT_EQ(overlap.origin.x, 0);
+    EXPECT_EQ(overlap.origin.y, 0);
+    EXPECT_EQ(overlap.width, 10);
+    EXPECT_EQ(overlap.height, 10);
 
 }
