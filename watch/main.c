@@ -28,6 +28,7 @@ static void power_management_init(void) {
 
 static void idle_state_handle(void) {
     app_sched_execute();
+    ui_update();
     if (NRF_LOG_PROCESS() == false) {
         nrf_pwr_mgmt_run();
     }

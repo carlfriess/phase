@@ -4,16 +4,22 @@
 
 #include "ui.h"
 
+#include "nrf_log.h"
+
 #include "GC9A01.h"
 #include "spi.h"
 #include "phase-ui.h"
 
+#define NRF_LOG_UI_FRAME(frame) NRF_LOG_INFO("(%d, %d) %d %d", frame.origin.x, frame.origin.y, frame.width, frame.height)
+
 #define CHUNK_SIZE  8
+#define IMG_BUF_AREA    (240 * CHUNK_SIZE)
+#define IMG_BUF_SIZE    (IMG_BUF_AREA * 3)
 
 extern const uint8_t background[];
 
-static uint8_t buf1[240 * CHUNK_SIZE * 3];
-static uint8_t buf2[240 * CHUNK_SIZE * 3];
+static uint8_t buf1[IMG_BUF_SIZE];
+static uint8_t buf2[IMG_BUF_SIZE];
 static uint8_t *bufs[] = {buf1, buf2};
 
 static inline void swap_bufs() {
@@ -40,21 +46,63 @@ void ui_init(void) {
 }
 
 void ui_update(void) {
-    phase::ui::Frame frame = {
-            .origin = {0, 0},
-            .width = 240,
-            .height = CHUNK_SIZE,
-    };
-    GC9A01_start_write();
-    for (; frame.origin.y < 240 + 1; frame.origin.y += CHUNK_SIZE) {
-        if (frame.origin.y > 0) {
-            spi_tx(bufs[0], sizeof(buf1));
-        }
-        if (frame.origin.y < 240) {
-            root.render(bufs[1], frame);
-        }
-        swap_bufs();
-        while (!spi_done());
+
+    // Get the screen area that needs to be updated
+    phase::ui::Frame dirty = root.getDirtyFrame();
+    if (dirty.width <= 0 || dirty.height <= 0) {
+        return;
     }
+    NRF_LOG_INFO("Updating UI region:");
+    NRF_LOG_UI_FRAME(dirty);
+
+    // Set the display memory write area
+    GC9A01_set_frame({
+        .start = {
+                .X = static_cast<uint16_t>(dirty.origin.x),
+                .Y = static_cast<uint16_t>(dirty.origin.y)
+        },
+        .end = {
+                .X = static_cast<uint16_t>(dirty.origin.x + dirty.width - 1),
+                .Y = static_cast<uint16_t>(dirty.origin.y + dirty.height - 1),
+        },
+    });
+
+    // Setup rendering frame
+    phase::ui::Frame frame = dirty;
+    size_t dirty_area = dirty.area();
+    size_t steps = (dirty_area + IMG_BUF_AREA - 1) / IMG_BUF_AREA;
+    frame.height = dirty_area / steps / dirty.width;
+
+    // Start writing to display memory
+    GC9A01_start_write();
+
+    do {
+
+        // Render the next part of the screen
+        root.render(bufs[0], frame);
+
+        // Wait for the last SPI transfer to complete
+        while (!spi_done());
+
+        // Start transferring the rendered buffer
+        spi_tx(bufs[0], frame.area() * 3);
+
+        // Move rendering frame
+        frame.origin.y += frame.height;
+        frame = frame.overlap(dirty);
+
+        // Swap image buffers
+        swap_bufs();
+
+    } while (frame.height > 0);
+
+    // Wait for the last SPI transfer to complete
+    while (!spi_done());
+
+    // Finish writing to display memory
     GC9A01_finish_write();
+
+    // Mark the view hierarchy as clean
+    root.clean();
+
 }
