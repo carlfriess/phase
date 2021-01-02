@@ -102,6 +102,8 @@ public:
 
     bool isDirty() const;
 
+    Frame getDirtyFrame() const;
+
     void clean();
 };
 

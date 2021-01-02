@@ -151,3 +151,33 @@ TEST(View, DirtyChild) {
     EXPECT_FALSE(view.isDirty());
 
 }
+
+TEST(View, DirtyFrame) {
+
+    phase::ui::View view({{0, 0}, 3, 3});
+    phase::ui::View child1({{0, 0}, 1, 1});
+    phase::ui::View child2({{2, 2}, 1, 1});
+    view.addChildView(&child1);
+    view.addChildView(&child2);
+
+    phase::ui::Frame dirty_frame = view.getDirtyFrame();
+    EXPECT_TRUE(dirty_frame.contains(view.getFrame()));
+    EXPECT_TRUE(view.getFrame().contains(dirty_frame));
+
+    view.clean();
+    dirty_frame = view.getDirtyFrame();
+    EXPECT_EQ(dirty_frame.width, 0);
+    EXPECT_EQ(dirty_frame.height, 0);
+
+    child2.setBackgroundColor(phase::ui::red);
+    dirty_frame = view.getDirtyFrame();
+    EXPECT_TRUE(dirty_frame.contains(child2.getFrame()));
+    EXPECT_TRUE(child2.getFrame().contains(dirty_frame));
+
+    child1.setBackgroundColor(phase::ui::blue);
+    child2.setBackgroundColor(phase::ui::blue);
+    dirty_frame = view.getDirtyFrame();
+    EXPECT_TRUE(dirty_frame.contains(child1.getFrame()));
+    EXPECT_TRUE(dirty_frame.contains(child2.getFrame()));
+
+}

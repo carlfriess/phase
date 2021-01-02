@@ -76,6 +76,34 @@ bool View::isDirty() const {
     return false;
 }
 
+Frame View::getDirtyFrame() const {
+
+    Frame df = {
+            .width = 0,
+            .height = 0,
+    };
+    bool valid = false;
+
+    // Check if this view is dirty
+    if (dirty) {
+        return frame;
+    }
+
+    // Check if any children are dirty
+    for (View *view : subviews) {
+        if (view->dirty) {
+            if (!valid) {
+                df = view->getDirtyFrame();
+                valid = true;
+            } else {
+                df = df.expand(view->getDirtyFrame());
+            }
+        }
+    }
+
+    return df;
+}
+
 void View::clean() {
     dirty = false;
     for (View *view : subviews) {
