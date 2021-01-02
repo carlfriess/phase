@@ -25,9 +25,18 @@ static inline void swap_bufs() {
 phase::ui::View root({{0, 0}, 240, 240});
 
 void ui_init(void) {
-    root.background_color[0] = 0xFF;
-    root.background_color[1] = 0xFF;
-    root.background_color[2] = 0xFF;
+
+    root.setOpaque(false);
+
+    // Add background image
+    auto backgroundView = new phase::ui::ImageView(background, root.getFrame());
+    root.addChildView(backgroundView);
+
+    // Add a square
+    auto square = new phase::ui::View({{120, 120}, 10, 10});
+    square->setBackgroundColor(phase::ui::red);
+    root.addChildView(square);
+
 }
 
 void ui_update(void) {

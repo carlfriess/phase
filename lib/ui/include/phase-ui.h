@@ -18,6 +18,12 @@ typedef int16_t Coord;
 
 typedef uint8_t Color[3];
 
+constexpr Color white = {0xFF, 0xFF, 0xFF};
+constexpr Color red = {0xFF, 0x00, 0x00};
+constexpr Color green = {0x00, 0xFF, 0x00};
+constexpr Color blue = {0x00, 0x00, 0xFF};
+constexpr Color black = {0x00, 0x00, 0x00};
+
 struct Point {
     Coord x, y;
 };
@@ -58,22 +64,37 @@ struct Frame {
 };
 
 class View {
-public:
+protected:
     Frame frame;
-    std::vector<View> subviews;
+    std::vector<View *> subviews;
+    bool visible = true;
     bool opaque = true;
     Color background_color = {0x00, 0x00, 0x00};
+
+public:
 
     explicit View(Frame frame) : frame(frame) {};
 
     virtual void render(uint8_t *buffer, Frame frame) const;
+
+    Frame getFrame() const;
+
+    void setVisible(bool on);
+
+    void setOpaque(bool on);
+
+    void setBackgroundColor(const Color &color);
+
+    void addChildView(View *view);
 };
 
-class ImageView : View {
+
+class ImageView final : public View {
     const uint8_t *img;
 
 public:
-    explicit ImageView(const uint8_t *img, Frame frame) : View(frame), img(img) {};
+    explicit ImageView(const uint8_t *img, Frame frame) : View(frame),
+                                                          img(img) {};
 
     void render(uint8_t *buffer, Frame frame) const override;
 };
