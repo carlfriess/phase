@@ -5,6 +5,7 @@
 #include "util.h"
 
 #include <cstring>
+#include <unistd.h>
 
 namespace phase {
 namespace ui {
@@ -24,16 +25,16 @@ void fill_frame_color(uint8_t *dst, const Frame &dst_frame, const Color color,
     }
 
     // Calculate steps for buffer
-    size_t dst_step = dst_frame.width * sizeof(Color);
+    size_t dst_step = static_cast<size_t>(dst_frame.width) * sizeof(Color);
 
     // Adjust buffer pointer for vertical offset
-    Coord y_offset = fill_frame.origin.y - dst_frame.origin.y;
+    ssize_t y_offset = fill_frame.origin.y - dst_frame.origin.y;
     if (y_offset > 0) {
         dst += y_offset * dst_step;
     }
 
     // Adjust buffer pointer for horizontal offset
-    Coord x_offset = fill_frame.origin.x - dst_frame.origin.x;
+    ssize_t x_offset = fill_frame.origin.x - dst_frame.origin.x;
     if (x_offset > 0) {
         dst += x_offset * sizeof(Color);
     }
@@ -56,11 +57,11 @@ void imgcpy(uint8_t *dst, const Frame &dst_frame, const uint8_t *img,
     }
 
     // Calculate steps for each buffer
-    size_t dst_step = dst_frame.width * sizeof(Color);
-    size_t img_step = img_frame.width * sizeof(Color);
+    size_t dst_step = static_cast<size_t>(dst_frame.width) * sizeof(Color);
+    size_t img_step = static_cast<size_t>(img_frame.width) * sizeof(Color);
 
     // Adjust buffer pointers for vertical offset
-    Coord y_offset = img_frame.origin.y - dst_frame.origin.y;
+    ssize_t y_offset = img_frame.origin.y - dst_frame.origin.y;
     if (y_offset > 0) {
         dst += y_offset * dst_step;
     } else {
@@ -68,7 +69,7 @@ void imgcpy(uint8_t *dst, const Frame &dst_frame, const uint8_t *img,
     }
 
     // Adjust buffer pointers for horizontal offset
-    Coord x_offset = img_frame.origin.x - dst_frame.origin.x;
+    ssize_t x_offset = img_frame.origin.x - dst_frame.origin.x;
     if (x_offset > 0) {
         dst += x_offset * sizeof(Color);
     } else {
@@ -77,7 +78,7 @@ void imgcpy(uint8_t *dst, const Frame &dst_frame, const uint8_t *img,
 
     // Calculate number of bytes that need to be copied per row
     Frame overlap = dst_frame.overlap(img_frame);
-    size_t n = overlap.width * sizeof(Color);
+    size_t n = static_cast<size_t>(overlap.width) * sizeof(Color);
 
     for (Coord row = 0; row < overlap.height; row++) {
         memcpy(dst, img, n);
