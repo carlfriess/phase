@@ -163,3 +163,30 @@ TEST(Frame, Overlap) {
     EXPECT_EQ(overlap.height, 10);
 
 }
+
+TEST(Frame, Expand) {
+
+    phase::ui::Frame frame1 = {
+            .origin = {10, 10},
+            .width = 5,
+            .height = 5,
+    };
+
+    phase::ui::Frame frame2 = {
+            .origin = {20, 20},
+            .width = 10,
+            .height = 5,
+    };
+
+    phase::ui::Frame expanded = {
+            .origin = {10, 10},
+            .width = 20,
+            .height = 15,
+    };
+
+    ASSERT_TRUE(frame1.expand(frame2).contains(expanded));
+    ASSERT_TRUE(expanded.contains(frame1.expand(frame2)));
+    ASSERT_TRUE(frame2.expand(frame1).contains(expanded));
+    ASSERT_TRUE(expanded.contains(frame2.expand(frame1)));
+
+}

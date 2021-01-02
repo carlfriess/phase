@@ -61,6 +61,18 @@ struct Frame {
                origin.x + width >= other.origin.x + other.width &&
                origin.y + height >= other.origin.y + other.height;
     }
+
+    inline Frame expand(const Frame &other) const {
+        Coord nX = min(origin.x, other.origin.x);
+        Coord nY = min(origin.y, other.origin.y);
+        Coord nW = max(origin.x + width, other.origin.x + other.width) - nX;
+        Coord nH = max(origin.y + height, other.origin.y + other.height) - nY;
+        return {
+                .origin = {nX, nY},
+                .width = nW,
+                .height = nH,
+        };
+    }
 };
 
 class View {
