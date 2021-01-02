@@ -21,6 +21,7 @@ cc_library(
     copts = nRF5_copts,
     includes = ["ui/include"],
     linkopts = nRF5_linkopts,
+    deps = ["//lib/fonts:quicksand-64"],
 )
 
 cc_test(
