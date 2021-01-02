@@ -80,3 +80,14 @@ http_archive(
     type = "tar.gz",
     url = "https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz",
 )
+
+# fontem - Embedded Font Library
+
+http_archive(
+    name = "fontem",
+    build_file = "@//external/fontem:fontem.BUILD",
+    patch_cmds = ["touch src/resource/config.h"],
+    sha256 = "9e84d52d7c4c252a5110360f5953629839889604074888ee4b8d9ee4758c7c1f",
+    strip_prefix = "fontem-475c24b9df89e3def8314b5d89de13c3d3069d25",
+    url = "https://github.com/chrisy/fontem/archive/475c24b9df89e3def8314b5d89de13c3d3069d25.zip",
+)
