@@ -8,6 +8,9 @@
 #include <cstdint>
 #include <vector>
 
+#define min(a, b)   ((a) < (b) ? (a) : (b))
+#define max(a, b)   ((a) > (b) ? (a) : (b))
+
 namespace phase {
 namespace ui {
 
@@ -32,6 +35,18 @@ struct Frame {
                  origin.y + height <= other.origin.y ||
                  other.origin.x + other.width <= origin.x ||
                  other.origin.y + other.height <= origin.y);
+    }
+
+    inline Frame overlap(const Frame &other) const {
+        Coord nX = max(origin.x, other.origin.x);
+        Coord nY = max(origin.y, other.origin.y);
+        Coord nW = min(origin.x + width, other.origin.x + other.width) - nX;
+        Coord nH = min(origin.y + height, other.origin.y + other.height) - nY;
+        return {
+                .origin = {nX, nY},
+                .width = nW,
+                .height = nH,
+        };
     }
 
     inline bool contains(const Frame &other) const {
