@@ -20,6 +20,7 @@ void View::render(uint8_t *buffer, Frame region) const {
     }
 
     // Call render on all visible subviews
+    // TODO: Don't render subviews that are covered by other subviews
     for (View *view : subviews) {
         if (view->frame.overlaps(region) && view->visible) {
             view->render(buffer, region);
@@ -79,7 +80,8 @@ bool View::isDirty() const {
 Frame View::getDirtyFrame() const {
 
     Frame df = {
-            .width = 0,
+            .origin = {0, 0},
+            .width  = 0,
             .height = 0,
     };
     bool valid = false;
