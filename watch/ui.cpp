@@ -10,6 +10,8 @@
 
 #define CHUNK_SIZE  8
 
+extern const uint8_t background[];
+
 static uint8_t buf1[240 * CHUNK_SIZE * 3];
 static uint8_t buf2[240 * CHUNK_SIZE * 3];
 static uint8_t *bufs[] = {buf1, buf2};

@@ -70,10 +70,12 @@ public:
 };
 
 class ImageView : View {
-    uint8_t *img;
+    const uint8_t *img;
 
 public:
-    explicit ImageView(uint8_t *img, Frame frame) : View(frame), img(img) {};
+    explicit ImageView(const uint8_t *img, Frame frame) : View(frame), img(img) {};
+
+    void render(uint8_t *buffer, Frame frame) const override;
 };
 
 }

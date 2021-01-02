@@ -12,7 +12,7 @@ namespace ui {
 
 void fill_color(uint8_t *dest, const Color color, size_t num);
 
-void imgcpy(uint8_t *dst, const Frame &dst_frame, uint8_t *img,
+void imgcpy(uint8_t *dst, const Frame &dst_frame, const uint8_t *img,
             const Frame &img_frame);
 
 }

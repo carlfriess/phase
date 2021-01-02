@@ -13,8 +13,6 @@
 #include "spi.h"
 #include "ui.h"
 
-extern const uint8_t background[];
-
 static void log_init(void) {
     ret_code_t err_code = NRF_LOG_INIT(NULL);
     APP_ERROR_CHECK(err_code);
