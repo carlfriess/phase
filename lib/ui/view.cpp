@@ -48,7 +48,7 @@ void View::setOpaque(bool on) {
 }
 
 void View::setBackgroundColor(const Color &color) {
-    if (memcmp(background_color, color, sizeof(Color))) {
+    if (memcmp(background_color, color, sizeof(Color)) != 0) {
         dirty = true;
     }
     memcpy(background_color, color, sizeof(Color));

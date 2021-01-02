@@ -11,6 +11,9 @@
 #define min(a, b)   ((a) < (b) ? (a) : (b))
 #define max(a, b)   ((a) > (b) ? (a) : (b))
 
+// Forward declaration of fontem type
+struct font;
+
 namespace phase {
 namespace ui {
 
@@ -107,7 +110,6 @@ public:
     void clean();
 };
 
-
 class ImageView final : public View {
     const uint8_t *img;
 
@@ -116,6 +118,22 @@ public:
                                                           img(img) {};
 
     void render(uint8_t *buffer, Frame frame) const override;
+};
+
+class TextView final : public View {
+    char *text = nullptr;
+    const struct font *font;
+    Color color = {0xFF, 0xFF, 0xFF};
+
+public:
+    explicit TextView(const struct font *font, Frame frame) : View(frame),
+                                                              font(font) {};
+
+    void render(uint8_t *buffer, Frame frame) const override;
+
+    size_t setText(const char *str);
+
+    void setColor(const Color &color);
 };
 
 }

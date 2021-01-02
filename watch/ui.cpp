@@ -9,6 +9,7 @@
 #include "GC9A01.h"
 #include "spi.h"
 #include "phase-ui.h"
+#include "font-quicksand-64.h"
 
 #define NRF_LOG_UI_FRAME(frame) NRF_LOG_INFO("(%d, %d) %d %d", frame.origin.x, frame.origin.y, frame.width, frame.height)
 
@@ -35,13 +36,18 @@ void ui_init(void) {
     root.setOpaque(false);
 
     // Add background image
-    auto backgroundView = new phase::ui::ImageView(background, root.getFrame());
-    root.addChildView(backgroundView);
+    auto background_view = new phase::ui::ImageView(background,
+                                                    root.getFrame());
+    root.addChildView(background_view);
 
-    // Add a square
-    auto square = new phase::ui::View({{120, 120}, 10, 10});
-    square->setBackgroundColor(phase::ui::red);
-    root.addChildView(square);
+    phase::ui::Frame time_frame{};
+    time_frame.origin.x = 20;
+    time_frame.origin.y = 120 - font_quicksand_64.height / 2;
+    time_frame.width = 200;
+    time_frame.height = font_quicksand_64.height;
+    auto time_view = new phase::ui::TextView(&font_quicksand_64, time_frame);
+    time_view->setText("12:34");
+    root.addChildView(time_view);
 
 }
 
