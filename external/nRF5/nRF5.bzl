@@ -3,23 +3,31 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 nRF5_copts = [
     "-O3",
     "-g3",
-    "-mcpu=cortex-m4",
-    "-mthumb -mabi=aapcs",
     "-Wall",
     "-Werror",
-    "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
     "-ffunction-sections -fdata-sections -fno-strict-aliasing",
     "-fno-builtin -fshort-enums",
-]
+] + select({
+    "@nRF5//:target_arm_none": [
+        "-mcpu=cortex-m4",
+        "-mthumb -mabi=aapcs",
+        "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
+    ],
+    "//conditions:default": [],
+})
 
 nRF5_linkopts = [
     "-O3 -g3",
-    "-mthumb -mabi=aapcs",
-    "-mcpu=cortex-m4",
-    "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
-    "-Wl,--gc-sections",
-    "-lc -lnosys -lm",
-]
+] + select({
+    "@nRF5//:target_arm_none": [
+        "-mthumb -mabi=aapcs",
+        "-mcpu=cortex-m4",
+        "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
+        "-Wl,--gc-sections",
+        "-lc -lnosys -lm",
+    ],
+    "//conditions:default": [],
+})
 
 def nRF5_binary(
         name = None,

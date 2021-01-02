@@ -25,12 +25,9 @@ cc_library(
 
 cc_test(
     name = "ui_test",
-    srcs = glob([
-        "ui/*.cpp",
-        "ui/**/*.h",
-    ]),
-    includes = ["ui/include"],
+    srcs = glob(["ui/*_test.cpp"]),
     deps = [
+        ":ui",
         "@gtest",
         "@gtest//:gtest_main",
     ],

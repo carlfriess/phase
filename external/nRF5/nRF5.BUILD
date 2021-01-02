@@ -136,6 +136,16 @@ cc_library(
 
 exports_files(glob(["**"]))
 
+# Configuration describing the target platform
+
+config_setting(
+    name = "target_arm_none",
+    constraint_values = [
+        "@platforms//cpu:arm",
+        "@platforms//os:none",
+    ],
+)
+
 # Configurations describing the host platform
 
 config_setting(
