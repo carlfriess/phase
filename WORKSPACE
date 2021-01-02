@@ -44,6 +44,14 @@ go_rules_dependencies()
 
 go_register_toolchains(version = "1.15.6")
 
+# GoogleTest Framework
+
+git_repository(
+    name = "gtest",
+    remote = "https://github.com/google/googletest",
+    tag = "release-1.10.0",
+)
+
 # Nordic nRF5 SDK
 
 http_archive(
@@ -71,12 +79,4 @@ http_archive(
     sha256 = "b99558dd631db7f06fe7cfab0a876d352851bbc1e97015432486588b9caf8184",
     type = "tar.gz",
     url = "https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz",
-)
-
-# GoogleTest Framework
-
-git_repository(
-    name = "gtest",
-    remote = "https://github.com/google/googletest",
-    tag = "release-1.10.0",
 )
