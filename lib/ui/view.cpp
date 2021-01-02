@@ -12,7 +12,7 @@ namespace ui {
 void View::render(uint8_t *buffer, Frame region) const {
 
     if (opaque) {
-        fill_color(buffer, background_color, region.area());
+        fill_frame_color(buffer, region, background_color, frame);
     }
 
     for (const View &view : subviews) {
