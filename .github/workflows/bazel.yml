@@ -14,5 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build all
+      - name: Build graphics_demo
         run: bazelisk build --platforms=@arm_none_eabi//platforms:arm_none_generic //graphics_demo:graphics_demo
+      - name: Build watch
+        run: bazelisk build --platforms=@arm_none_eabi//platforms:arm_none_generic //watch:watch
+  test:
+    name: Bazel Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test UI library
+        run: bazelisk test //lib:ui_test
