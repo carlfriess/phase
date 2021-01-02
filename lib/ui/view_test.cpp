@@ -24,7 +24,7 @@ TEST(View, BackgroundColor) {
 
 }
 
-TEST(View, Visibile) {
+TEST(View, Visible) {
 
     uint8_t buf[sizeof(phase::ui::Color)];
     phase::ui::View root({{0, 0}, 1, 1});
@@ -96,5 +96,58 @@ TEST(View, Children) {
     for (size_t i = 0; i < sizeof(phase::ui::Color); ++i) {
         EXPECT_EQ(buf[i], phase::ui::blue[i]);
     }
+
+}
+
+TEST(View, DirtyView) {
+
+    phase::ui::View view({{0, 0}, 1, 1});
+    EXPECT_TRUE(view.isDirty());
+
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
+
+    view.setOpaque(true);
+    EXPECT_FALSE(view.isDirty());
+    view.setOpaque(false);
+    EXPECT_TRUE(view.isDirty());
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
+
+    view.setVisible(true);
+    EXPECT_FALSE(view.isDirty());
+    view.setVisible(false);
+    EXPECT_TRUE(view.isDirty());
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
+
+    view.setBackgroundColor(phase::ui::black);
+    EXPECT_FALSE(view.isDirty());
+    view.setBackgroundColor(phase::ui::white);
+    EXPECT_TRUE(view.isDirty());
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
+
+}
+
+TEST(View, DirtyChild) {
+
+    phase::ui::View view({{0, 0}, 1, 1});
+    phase::ui::View child({{0, 0}, 1, 1});
+    EXPECT_TRUE(view.isDirty());
+
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
+    view.addChildView(&child);
+    EXPECT_TRUE(view.isDirty());
+    child.clean();
+    EXPECT_TRUE(view.isDirty());
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
+
+    child.setBackgroundColor(phase::ui::red);
+    EXPECT_TRUE(view.isDirty());
+    view.clean();
+    EXPECT_FALSE(view.isDirty());
 
 }

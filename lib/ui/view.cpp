@@ -33,20 +33,54 @@ Frame View::getFrame() const {
 }
 
 void View::setVisible(bool on) {
-    View::visible = on;
+    if (visible != on) {
+        dirty = true;
+    }
+    visible = on;
 }
 
 void View::setOpaque(bool on) {
-    View::opaque = on;
+    if (opaque != on) {
+        dirty = true;
+    }
+    opaque = on;
 }
 
 void View::setBackgroundColor(const Color &color) {
+    if (memcmp(background_color, color, sizeof(Color))) {
+        dirty = true;
+    }
     memcpy(background_color, color, sizeof(Color));
 }
 
 void View::addChildView(View *view) {
     assert(frame.contains(view->frame));
+    dirty = true;
     subviews.push_back(view);
+}
+
+bool View::isDirty() const {
+
+    // Check if this view is dirty
+    if (dirty) {
+        return true;
+    }
+
+    // Check if any children are dirty
+    for (View *view : subviews) {
+        if (view->dirty) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void View::clean() {
+    dirty = false;
+    for (View *view : subviews) {
+        view->dirty = false;
+    }
 }
 
 }

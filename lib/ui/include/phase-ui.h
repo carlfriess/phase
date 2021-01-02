@@ -82,6 +82,7 @@ protected:
     bool visible = true;
     bool opaque = true;
     Color background_color = {0x00, 0x00, 0x00};
+    bool dirty = true;
 
 public:
 
@@ -98,6 +99,10 @@ public:
     void setBackgroundColor(const Color &color);
 
     void addChildView(View *view);
+
+    bool isDirty() const;
+
+    void clean();
 };
 
 
