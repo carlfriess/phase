@@ -26,6 +26,20 @@ struct Frame {
     inline size_t area() const {
         return width * height;
     }
+
+    inline bool overlaps(const Frame &other) const {
+        return !(origin.x + width <= other.origin.x ||
+                 origin.y + height <= other.origin.y ||
+                 other.origin.x + other.width <= origin.x ||
+                 other.origin.y + other.height <= origin.y);
+    }
+
+    inline bool contains(const Frame &other) const {
+        return origin.x <= other.origin.x &&
+               origin.y <= other.origin.y &&
+               origin.x + width >= other.origin.x + other.width &&
+               origin.y + height >= other.origin.y + other.height;
+    }
 };
 
 class View {
