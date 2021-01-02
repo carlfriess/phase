@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "phase-ui.h"
 
-TEST(FrameTest, Area) {
+TEST(Frame, Area) {
 
     phase::ui::Frame frame = {
             .origin = {0, 0},
@@ -17,7 +17,7 @@ TEST(FrameTest, Area) {
 
 }
 
-TEST(FrameTest, Overlaps) {
+TEST(Frame, Overlaps) {
 
     phase::ui::Frame frame1 = {
             .origin = {0, 0},
@@ -56,7 +56,7 @@ TEST(FrameTest, Overlaps) {
 
 }
 
-TEST(FrameTest, Contains) {
+TEST(Frame, Contains) {
 
     phase::ui::Frame frame1 = {
             .origin = {0, 0},
@@ -102,7 +102,7 @@ TEST(FrameTest, Contains) {
 
 }
 
-TEST(FrameTest, Overlap) {
+TEST(Frame, Overlap) {
 
     phase::ui::Frame frame1 = {
             .origin = {0, 0},
