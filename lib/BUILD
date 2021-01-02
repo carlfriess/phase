@@ -26,7 +26,7 @@ cc_library(
 cc_test(
     name = "ui_test",
     srcs = glob([
-        "ui/*_test.cpp",
+        "ui/*.cpp",
         "ui/**/*.h",
     ]),
     includes = ["ui/include"],
