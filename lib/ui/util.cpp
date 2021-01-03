@@ -18,8 +18,8 @@ void fill_color(uint8_t *dest, const Color color, size_t num) {
 }
 
 void blend_color(uint8_t *dst, const Color color, uint8_t alpha) {
-    uint16_t a = alpha;
-    uint16_t a_inv = 0xFF - alpha;
+    uint16_t a = static_cast<uint16_t>(alpha) + 1;
+    uint16_t a_inv = 0x100 - alpha;
     dst[0] = (color[0] * a + dst[0] * a_inv) >> 8;
     dst[1] = (color[1] * a + dst[1] * a_inv) >> 8;
     dst[2] = (color[2] * a + dst[2] * a_inv) >> 8;
