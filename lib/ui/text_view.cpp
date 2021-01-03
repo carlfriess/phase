@@ -26,6 +26,9 @@ void TextView::render(uint8_t *buffer, Frame region) const {
         fill_frame_color(buffer, region, background_color, frame);
     }
 
+    // Move initial frame according to text alignment offset
+    glyph_frame.origin.x += alignment_offset;
+
     // Iterate the string
     for (const char *p = text; *p; p++) {
 
@@ -79,6 +82,19 @@ size_t TextView::setText(const char *str) {
         }
     }
 
+    // Calculate text alignment offset
+    switch (align) {
+        case LEFT:
+            alignment_offset = 0;
+            break;
+        case CENTER:
+            alignment_offset = (frame.width - width) / 2;
+            break;
+        case RIGHT:
+            alignment_offset = frame.width - width;
+            break;
+    }
+
     // Check if the new string is different
     if (numChars != strlen(text) || strncmp(text, str, numChars)) {
 
@@ -101,6 +117,16 @@ void TextView::setColor(const Color &new_color) {
         dirty = true;
     }
     memcpy(color, new_color, sizeof(Color));
+}
+
+void TextView::setTextAlignment(TextView::TextAlignment setting) {
+    if (align != setting) {
+        align = setting;
+        if (text) {
+            setText(text);
+            dirty = true;
+        }
+    }
 }
 
 }

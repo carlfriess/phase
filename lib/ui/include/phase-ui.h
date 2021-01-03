@@ -121,9 +121,18 @@ public:
 };
 
 class TextView final : public View {
+
+public:
+    enum TextAlignment {
+        LEFT, CENTER, RIGHT,
+    };
+
+private:
     char *text = nullptr;
     const struct font *font;
     Color color = {0xFF, 0xFF, 0xFF};
+    enum TextAlignment align = CENTER;
+    Coord alignment_offset;
 
 public:
     explicit TextView(const struct font *font, Frame frame) : View(frame),
@@ -134,6 +143,8 @@ public:
     size_t setText(const char *str);
 
     void setColor(const Color &color);
+
+    void setTextAlignment(enum TextAlignment setting);
 };
 
 }
