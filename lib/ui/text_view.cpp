@@ -18,7 +18,7 @@ namespace ui {
 
 void TextView::render(uint8_t *buffer, Frame region) const {
 
-    Frame draw_frame = frame;
+    Frame glyph_frame = frame;
     glyph_t prev = 0;
 
     // Fill the background if this view is opaque
@@ -36,21 +36,21 @@ void TextView::render(uint8_t *buffer, Frame region) const {
         }
 
         // Setup draw frame for next glyph
-        draw_frame.origin.x += g->left;
-        draw_frame.origin.y = frame.origin.y + (font->ascender - g->top);
-        draw_frame.width = g->cols;
-        draw_frame.height = g->rows;
+        glyph_frame.origin.x += g->left;
+        glyph_frame.origin.y = frame.origin.y + (font->ascender - g->top);
+        glyph_frame.width = g->cols;
+        glyph_frame.height = g->rows;
 
         // Check if the glyph overlaps with the buffer region
-        if (region.overlaps(draw_frame)) {
+        if (region.overlaps(glyph_frame)) {
 
             // Draw the glyph
-            fill_frame_color(buffer, region, color, draw_frame);
+            mask_frame_color(buffer, region, color, g->bitmap, glyph_frame);
 
         }
 
         // Advance to the next character
-        draw_frame.origin.x +=
+        glyph_frame.origin.x +=
                 g->advance - g->left + font_get_kerning(font, prev, *p);
         prev = *p;
 
