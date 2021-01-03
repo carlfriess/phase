@@ -81,6 +81,8 @@
 
 #include "nrf_log.h"
 
+#include "ui.h"
+
 #define DEVICE_NAME                     "Phase Watch"                               /**< Name of the device. Will be included in the advertising data. */
 
 #define APP_BLE_OBSERVER_PRIO           3                                           /**< Application's BLE observer priority. You shouldn't need to modify this value. */
@@ -386,6 +388,10 @@ static void current_time_print(ble_cts_c_evt_t * p_evt)
                  p_evt->params.current_time.adjust_reason.external_reference_time_update);
     NRF_LOG_INFO("\tManual update    %x",
                  p_evt->params.current_time.adjust_reason.manual_time_update);
+
+    ui_set_time(
+            p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours,
+            p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes);
 }
 
 

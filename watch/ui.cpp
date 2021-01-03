@@ -4,6 +4,8 @@
 
 #include "ui.h"
 
+#include <cstdio>
+
 #include "nrf_log.h"
 
 #include "GC9A01.h"
@@ -31,6 +33,8 @@ static inline void swap_bufs() {
 
 phase::ui::View root({{0, 0}, 240, 240});
 
+phase::ui::TextView *time_view;
+
 void ui_init(void) {
 
     root.setOpaque(false);
@@ -41,12 +45,13 @@ void ui_init(void) {
     root.addChildView(background_view);
 
     phase::ui::Frame time_frame{};
-    time_frame.origin.x = 20;
+    time_frame.origin.x = 0;
     time_frame.origin.y = 120 - font_quicksand_64.height / 2;
-    time_frame.width = 200;
+    time_frame.width = 240;
     time_frame.height = font_quicksand_64.height;
-    auto time_view = new phase::ui::TextView(&font_quicksand_64, time_frame);
-    time_view->setText("12:34");
+    time_view = new phase::ui::TextView(&font_quicksand_64, time_frame);
+    time_view->setText("00:00");
+    time_view->setOpaque(false);
     root.addChildView(time_view);
 
 }
@@ -111,4 +116,10 @@ void ui_update(void) {
     // Mark the view hierarchy as clean
     root.clean();
 
+}
+
+void ui_set_time(uint8_t hr, uint8_t min) {
+    char str[6];
+    snprintf(str, sizeof(str), "%02d:%02d", hr, min);
+    time_view->setText(str);
 }
