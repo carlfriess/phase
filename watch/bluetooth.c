@@ -392,6 +392,10 @@ static void current_time_print(ble_cts_c_evt_t * p_evt)
     ui_set_time(
             p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours,
             p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes);
+    ui_set_date(
+            day_of_week[p_evt->params.current_time.exact_time_256.day_date_time.day_of_week],
+            p_evt->params.current_time.exact_time_256.day_date_time.date_time.day,
+            month_of_year[p_evt->params.current_time.exact_time_256.day_date_time.date_time.month]);
 }
 
 

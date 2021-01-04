@@ -104,6 +104,7 @@ nRF5_binary(
         "//lib:GC9A01",
         "//lib:ui",
         "//lib/fonts:quicksand-64",
+        "//lib/fonts:opensans-12",
     ],
 )
 
