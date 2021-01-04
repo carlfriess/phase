@@ -11,3 +11,23 @@ cc_library(
     linkopts = nRF5_linkopts,
     deps = ["@fontem//:libfontem"],
 )
+
+cc_library(
+    name = "opensans-12",
+    srcs = ["font-opensans-12.c"],
+    hdrs = ["font-opensans-12.h"],
+    copts = nRF5_copts,
+    includes = ["."],
+    linkopts = nRF5_linkopts,
+    deps = ["@fontem//:libfontem"],
+)
+
+cc_library(
+    name = "opensans-bold-12",
+    srcs = ["font-opensans-bold-12.c"],
+    hdrs = ["font-opensans-bold-12.h"],
+    copts = nRF5_copts,
+    includes = ["."],
+    linkopts = nRF5_linkopts,
+    deps = ["@fontem//:libfontem"],
+)
