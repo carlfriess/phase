@@ -79,16 +79,7 @@ struct Frame {
 };
 
 class View {
-protected:
-    Frame frame;
-    std::vector<View *> subviews;
-    bool visible = true;
-    bool opaque = true;
-    Color background_color = {0x00, 0x00, 0x00};
-    bool dirty = true;
-
 public:
-
     explicit View(Frame frame) : frame(frame) {};
 
     virtual void render(uint8_t *buffer, Frame frame) const;
@@ -108,33 +99,33 @@ public:
     Frame getDirtyFrame() const;
 
     void clean();
+
+protected:
+    Frame frame;
+    std::vector<View *> subviews;
+    bool visible = true;
+    bool opaque = true;
+    Color background_color = {0x00, 0x00, 0x00};
+    bool dirty = true;
 };
 
 class ImageView final : public View {
-    const uint8_t *img;
-
 public:
     explicit ImageView(const uint8_t *img, Frame frame) : View(frame),
                                                           img(img) {};
 
     void render(uint8_t *buffer, Frame frame) const override;
+
+private:
+    const uint8_t *img;
 };
 
 class TextView final : public View {
-
 public:
     enum TextAlignment {
         LEFT, CENTER, RIGHT,
     };
 
-private:
-    char *text = nullptr;
-    const struct font *font;
-    Color color = {0xFF, 0xFF, 0xFF};
-    enum TextAlignment align = CENTER;
-    Coord alignment_offset;
-
-public:
     explicit TextView(const struct font *font, Frame frame) : View(frame),
                                                               font(font) {};
 
@@ -145,6 +136,13 @@ public:
     void setColor(const Color &color);
 
     void setTextAlignment(enum TextAlignment setting);
+
+private:
+    char *text = nullptr;
+    const struct font *font;
+    Color color = {0xFF, 0xFF, 0xFF};
+    enum TextAlignment align = CENTER;
+    Coord alignment_offset;
 };
 
 }
