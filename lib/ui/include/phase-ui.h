@@ -120,7 +120,7 @@ private:
     const uint8_t *img;
 };
 
-class TextView final : public View {
+class TextView : public View {
 public:
     enum TextAlignment {
         LEFT, CENTER, RIGHT,
@@ -131,13 +131,13 @@ public:
 
     void render(uint8_t *buffer, Frame frame) const override;
 
-    size_t setText(const char *str);
+    virtual size_t setText(const char *str);
 
-    void setColor(const Color &color);
+    virtual void setColor(const Color &color);
 
-    void setTextAlignment(enum TextAlignment setting);
+    virtual void setTextAlignment(enum TextAlignment setting);
 
-private:
+protected:
     char *text = nullptr;
     const struct font *font;
     Color color = {0xFF, 0xFF, 0xFF};

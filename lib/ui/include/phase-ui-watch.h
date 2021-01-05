@@ -19,6 +19,22 @@ constexpr Frame display_frame = {
 
 Frame clip_frame_to_fit_circle(Frame frame, const Frame &circle);
 
+class MultilineTextView final : public TextView {
+public:
+    MultilineTextView(const struct font *font, Frame frame) : TextView(font,
+                                                                       frame) {};
+
+    ~MultilineTextView() override;
+
+    void render(uint8_t *buffer, Frame frame) const override;
+
+    size_t setText(const char *str) override;
+
+    void setColor(const Color &color) override;
+
+    void setTextAlignment(enum TextAlignment setting) override;
+};
+
 }
 }
 }
