@@ -14,8 +14,8 @@ cc_library(
 cc_library(
     name = "ui",
     srcs = glob(
-        ["ui/*.cpp"],
-        exclude = ["ui/*_test.cpp"],
+        ["ui/**/*.cpp"],
+        exclude = ["ui/**/*_test.cpp"],
     ),
     hdrs = glob(["ui/**/*.h"]),
     copts = nRF5_copts,
@@ -26,7 +26,7 @@ cc_library(
 
 cc_test(
     name = "ui_test",
-    srcs = glob(["ui/*_test.cpp"]),
+    srcs = glob(["ui/**/*_test.cpp"]),
     deps = [
         ":ui",
         "@gtest",

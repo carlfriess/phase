@@ -17,6 +17,8 @@ constexpr Frame display_frame = {
         .height = 240,
 };
 
+Frame clip_frame_to_fit_circle(Frame frame, const Frame &circle);
+
 }
 }
 }
