@@ -11,6 +11,7 @@
 #include "GC9A01.h"
 #include "spi.h"
 #include "phase-ui.h"
+#include "phase-ui-watch.h"
 #include "font-quicksand-64.h"
 #include "font-opensans-12.h"
 
@@ -32,7 +33,7 @@ static inline void swap_bufs() {
     bufs[0] = tmp;
 }
 
-phase::ui::View root({{0, 0}, 240, 240});
+phase::ui::View root(phase::ui::watch::display_frame);
 
 phase::ui::TextView *time_view;
 phase::ui::TextView *date_view;
