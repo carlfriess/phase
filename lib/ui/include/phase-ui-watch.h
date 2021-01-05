@@ -35,6 +35,15 @@ public:
     void setTextAlignment(enum TextAlignment setting) override;
 };
 
+class NotificationView final : public View {
+public:
+    explicit NotificationView(const char *title, const struct font *title_font,
+                              const char *body, const struct font *body_font,
+                              Frame frame);
+
+    ~NotificationView() override;
+};
+
 }
 }
 }
