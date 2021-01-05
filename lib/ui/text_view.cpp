@@ -129,5 +129,11 @@ void TextView::setTextAlignment(TextView::TextAlignment setting) {
     }
 }
 
+TextView::~TextView() {
+    if (text) {
+        free(text);
+    }
+}
+
 }
 }

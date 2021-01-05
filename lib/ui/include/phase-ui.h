@@ -81,6 +81,7 @@ struct Frame {
 class View {
 public:
     explicit View(Frame frame) : frame(frame) {};
+    virtual ~View() = default;
 
     virtual void render(uint8_t *buffer, Frame frame) const;
 
@@ -111,8 +112,7 @@ protected:
 
 class ImageView final : public View {
 public:
-    explicit ImageView(const uint8_t *img, Frame frame) : View(frame),
-                                                          img(img) {};
+    ImageView(const uint8_t *img, Frame frame) : View(frame), img(img) {};
 
     void render(uint8_t *buffer, Frame frame) const override;
 
@@ -126,8 +126,8 @@ public:
         LEFT, CENTER, RIGHT,
     };
 
-    explicit TextView(const struct font *font, Frame frame) : View(frame),
-                                                              font(font) {};
+    TextView(const struct font *font, Frame frame) : View(frame), font(font) {};
+    ~TextView() override;
 
     void render(uint8_t *buffer, Frame frame) const override;
 
