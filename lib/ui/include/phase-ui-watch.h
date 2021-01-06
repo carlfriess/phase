@@ -28,7 +28,7 @@ public:
 
     void render(uint8_t *buffer, Frame frame) const override;
 
-    size_t setText(const char *str) override;
+    size_t setText(const std::string str) override;
 
     void setColor(const Color &color) override;
 

@@ -21,7 +21,10 @@ cc_library(
     copts = nRF5_copts,
     includes = ["ui/include"],
     linkopts = nRF5_linkopts,
-    deps = ["@fontem//:libfontem"],
+    deps = [
+        "@fontem//:libfontem",
+        "@utfcpp//:utfcpp",
+    ],
 )
 
 cc_test(

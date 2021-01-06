@@ -16,7 +16,7 @@ void MultilineTextView::render(uint8_t *buffer, Frame frame) const {
     View::render(buffer, frame);
 }
 
-size_t MultilineTextView::setText(const char *str) {
+size_t MultilineTextView::setText(const std::string str) {
 
     // Deallocate all previous views
     for (View *view : subviews) {
@@ -28,7 +28,7 @@ size_t MultilineTextView::setText(const char *str) {
     Frame sub_frame = frame;
     sub_frame.height = font->height;
 
-    while (offset < strlen(str)) {
+    while (offset < str.length()) {
 
         // Check if the next line will fit in the frame
         if (!frame.contains(sub_frame)) {
@@ -41,7 +41,7 @@ size_t MultilineTextView::setText(const char *str) {
         // Create view for next line
         auto view = new TextView(font, sub_frame);
         view->setOpaque(false);
-        offset += view->setText(str + offset);
+        offset += view->setText(str.substr(offset));
         addChildView(view);
 
         // Move sub-frame

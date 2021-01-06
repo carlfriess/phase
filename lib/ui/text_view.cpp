@@ -11,6 +11,8 @@ extern "C" {
 #include "fontem.h"
 }
 
+#include "utf8.h"
+
 #include "util.h"
 
 namespace phase {
@@ -30,10 +32,14 @@ void TextView::render(uint8_t *buffer, Frame region) const {
     glyph_frame.origin.x += alignment_offset;
 
     // Iterate the string
-    for (const char *p = text; *p; p++) {
+    auto it = text.begin();
+    while (it < text.end()) {
+
+        // Get next UTF-8 character
+        glyph_t cur = utf8::next(it, text.end());
 
         // Fetch the next glyph
-        const struct glyph *g = font_get_glyph(font, *p);
+        const struct glyph *g = font_get_glyph(font, cur);
         if (g == nullptr) {
             continue;
         }
@@ -54,32 +60,41 @@ void TextView::render(uint8_t *buffer, Frame region) const {
 
         // Advance to the next character
         glyph_frame.origin.x +=
-                g->advance - g->left + font_get_kerning(font, prev, *p);
-        prev = *p;
+                g->advance - g->left + font_get_kerning(font, prev, cur);
+        prev = cur;
 
     }
 
 }
 
-size_t TextView::setText(const char *str) {
+size_t TextView::setText(const std::string str) {
 
-    size_t numChars = 0;
     Coord width = 0;
     glyph_t prev = 0;
 
     // Iterate string and calculate width until frame width is exceeded
-    for (const char *p = str; *p; p++, numChars++) {
-        const struct glyph *g = font_get_glyph(font, *p);
-        if (g == nullptr) {
+    auto it = str.begin();
+    while (it < str.end()) {
+
+        // Get next UTF-8 character
+        glyph_t cur = utf8::next(it, str.end());
+
+        // Lookup the next glyph
+        const struct glyph *g = font_get_glyph(font, cur);
+        if (g == nullptr && (g = font_get_glyph(font, '?')) == nullptr) {
             continue;
         }
-        Coord gWidth = g->advance + font_get_kerning(font, prev, *p);
-        prev = *p;
+
+        // Calculate width
+        Coord gWidth = g->advance + font_get_kerning(font, prev, cur);
+        prev = cur;
         if (width + gWidth <= frame.width) {
             width += gWidth;
         } else {
+            utf8::prior(it, str.begin());
             break;
         }
+
     }
 
     // Calculate text alignment offset
@@ -95,21 +110,13 @@ size_t TextView::setText(const char *str) {
             break;
     }
 
-    // Check if the new string is different
-    if (numChars != strlen(text) || strncmp(text, str, numChars)) {
+    // Get accepted substring and set dirty flag
+    auto sub_str = std::string(str.begin(), it);
+    dirty = text != sub_str;
+    text = sub_str;
 
-        // Set dirty flag
-        dirty = true;
-
-        // Free previous string information and copy the accepted substring
-        if (text) {
-            free(text);
-        }
-        text = strndup(str, numChars);
-
-    }
-
-    return numChars;
+    // Return byte length of accepted substring
+    return it - str.begin();
 }
 
 void TextView::setColor(const Color &new_color) {
@@ -122,16 +129,10 @@ void TextView::setColor(const Color &new_color) {
 void TextView::setTextAlignment(TextView::TextAlignment setting) {
     if (align != setting) {
         align = setting;
-        if (text) {
+        if (text.length()) {
             setText(text);
             dirty = true;
         }
-    }
-}
-
-TextView::~TextView() {
-    if (text) {
-        free(text);
     }
 }
 

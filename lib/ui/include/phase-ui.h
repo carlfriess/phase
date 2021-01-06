@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
 #define min(a, b)   ((a) < (b) ? (a) : (b))
 #define max(a, b)   ((a) > (b) ? (a) : (b))
@@ -127,18 +128,17 @@ public:
     };
 
     TextView(const struct font *font, Frame frame) : View(frame), font(font) {};
-    ~TextView() override;
 
     void render(uint8_t *buffer, Frame frame) const override;
 
-    virtual size_t setText(const char *str);
+    virtual size_t setText(const std::string str);
 
     virtual void setColor(const Color &color);
 
     virtual void setTextAlignment(enum TextAlignment setting);
 
 protected:
-    char *text = nullptr;
+    std::string text = "";
     const struct font *font;
     Color color = {0xFF, 0xFF, 0xFF};
     enum TextAlignment align = CENTER;
