@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"image"
 	"image/color"
 	_ "image/jpeg"
@@ -30,12 +31,17 @@ func RGB565(color color.Color) []uint8 {
 
 func main() {
 
-	if len(os.Args) < 4 {
-		log.Fatal("no input file specified")
-	}
+	var inputFile string
+	var templateFile string
+	var outputFile string
+
+	flag.StringVar(&inputFile, "input", "", "Input image file")
+	flag.StringVar(&templateFile, "template", "", "Template file for output")
+	flag.StringVar(&outputFile, "output", "", "Output file")
+	flag.Parse()
 
 	// Open input image file
-	input, err := os.Open(os.Args[3])
+	input, err := os.Open(inputFile)
 	if err != nil {
 	    log.Fatal(err)
 	}
@@ -59,18 +65,18 @@ func main() {
 	}
 
 	// Create the output file
-	output, err := os.Create(os.Args[1])
+	output, err := os.Create(outputFile)
 	if err != nil {
 		log.Fatalf("error creating output file: %v", err)
 	}
 	defer output.Close()
 
 	// Determine the name of the image
-	name := filepath.Base(os.Args[1])
+	name := filepath.Base(outputFile)
 	name = name[0:len(name) - len(filepath.Ext(name))]
 
 	// Parse the template and execute it
-	if t, err := template.ParseFiles(os.Args[2]); err != nil {
+	if t, err := template.ParseFiles(templateFile); err != nil {
 		log.Fatalf("error parsing template file: %v", err)
 	} else if err := t.Execute(output, struct {
 		Name string
