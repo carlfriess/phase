@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	_ "image/jpeg"
+	_ "image/png"
 	"log"
 	"os"
 	"path/filepath"
@@ -29,15 +30,22 @@ func RGB565(color color.Color) []uint8 {
 	}
 }
 
+func Mask8(color color.Color) []uint8 {
+	_, _, _, a := color.RGBA()
+	return []uint8{ uint8(a >> 8) }
+}
+
 func main() {
 
 	var inputFile string
 	var templateFile string
 	var outputFile string
+	var mask bool
 
 	flag.StringVar(&inputFile, "input", "", "Input image file")
 	flag.StringVar(&templateFile, "template", "", "Template file for output")
 	flag.StringVar(&outputFile, "output", "", "Output file")
+	flag.BoolVar(&mask, "mask", false, "Treat the input image as a mask")
 	flag.Parse()
 
 	// Open input image file
@@ -60,7 +68,11 @@ func main() {
 	// Iterate each pixel and collect color data
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			imgData = append(imgData, RGB888(img.At(x, y)))
+			if mask {
+				imgData = append(imgData, Mask8(img.At(x, y)))
+			} else {
+				imgData = append(imgData, RGB888(img.At(x, y)))
+			}
 		}
 	}
 
