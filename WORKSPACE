@@ -16,11 +16,10 @@ http_archive(
 
 # Toolchain: GCC ARM Embedded 9.2019q4.major
 
-http_archive(
+git_repository(
     name = "arm_none_eabi",
-    sha256 = "3d3728cbe88b08c12cd2cb89afcff9294bd77be958c78188db77fdc8ab7e7a5d",
-    strip_prefix = "bazel-arm-none-eabi-1.1",
-    url = "https://github.com/d-asnaghi/bazel-arm-none-eabi/archive/v1.1.tar.gz",
+    remote = "https://github.com/carlfriess/bazel-arm-none-eabi",
+    commit = "f0f384be4e6c6b6cd1cf23dbb3104df1659afa9c",
 )
 
 load("@arm_none_eabi//:deps.bzl", "arm_none_eabi_deps")
