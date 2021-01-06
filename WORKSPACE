@@ -19,7 +19,7 @@ http_archive(
 git_repository(
     name = "arm_none_eabi",
     remote = "https://github.com/carlfriess/bazel-arm-none-eabi",
-    commit = "f0f384be4e6c6b6cd1cf23dbb3104df1659afa9c",
+    commit = "ec83de68abbb7985287ac4e60962e26ec26e98e4",
 )
 
 load("@arm_none_eabi//:deps.bzl", "arm_none_eabi_deps")
