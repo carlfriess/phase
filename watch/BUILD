@@ -103,8 +103,9 @@ nRF5_binary(
     deps = [
         "//lib:GC9A01",
         "//lib:ui",
-        "//lib/fonts:quicksand-64",
+        "//lib:ui-watch",
         "//lib/fonts:opensans-12",
+        "//lib/fonts:quicksand-64",
     ],
 )
 
