@@ -119,8 +119,11 @@ public:
 
     void render(uint8_t *buffer, Frame frame) const override;
 
+    void setMask(const uint8_t *buffer);
+
 private:
     const uint8_t *img;
+    const uint8_t *mask = nullptr;
 };
 
 class TextView : public View {
