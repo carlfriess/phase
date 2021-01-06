@@ -139,5 +139,57 @@ void imgcpy(uint8_t *dst, const Frame &dst_frame, const uint8_t *img,
 
 }
 
+void imgcpy_mask(uint8_t *dst, const Frame &dst_frame, const uint8_t *mask,
+                 const uint8_t *img, const Frame &img_frame) {
+
+    if (!dst_frame.overlaps(img_frame)) {
+        return;
+    }
+
+    // Calculate steps for each buffer
+    size_t dst_step = static_cast<size_t>(dst_frame.width) * sizeof(Color);
+    size_t img_step = static_cast<size_t>(img_frame.width) * sizeof(Color);
+    size_t mask_step = img_frame.width;
+
+    // Adjust buffer pointers for vertical offset
+    ssize_t y_offset = img_frame.origin.y - dst_frame.origin.y;
+    if (y_offset > 0) {
+        dst += y_offset * dst_step;
+    } else {
+        img += (-y_offset) * img_step;
+        mask += (-y_offset) * mask_step;
+    }
+
+    // Adjust buffer pointers for horizontal offset
+    ssize_t x_offset = img_frame.origin.x - dst_frame.origin.x;
+    if (x_offset > 0) {
+        dst += x_offset * sizeof(Color);
+    } else {
+        img += (-x_offset) * sizeof(Color);
+        mask -= x_offset;
+    }
+
+    // Calculate number of bytes that need to be copied per row
+    Frame overlap = dst_frame.overlap(img_frame);
+    size_t n = static_cast<size_t>(overlap.width) * sizeof(Color);
+
+    for (Coord row = 0; row < overlap.height; row++) {
+        uint8_t *limit = dst + n;
+        uint8_t *d = dst;
+        const uint8_t *i = img;
+        const uint8_t *m = mask;
+        while (d < limit) {
+            blend_color(d, i, *m);
+            d += sizeof(Color);
+            i += sizeof(Color);
+            m++;
+        }
+        dst += dst_step;
+        img += img_step;
+        mask += mask_step;
+    }
+
+}
+
 }
 }

@@ -23,6 +23,9 @@ void mask_frame_color(uint8_t *dst, const Frame &dst_frame, const Color color,
 void imgcpy(uint8_t *dst, const Frame &dst_frame, const uint8_t *img,
             const Frame &img_frame);
 
+void imgcpy_mask(uint8_t *dst, const Frame &dst_frame, const uint8_t *mask,
+                 const uint8_t *img, const Frame &img_frame);
+
 }
 }
 
