@@ -39,7 +39,7 @@ class NotificationView final : public View {
 public:
     explicit NotificationView(const char *title, const struct font *title_font,
                               const char *body, const struct font *body_font,
-                              Frame frame);
+                              const uint8_t *icon, Frame frame);
 
     ~NotificationView() override;
 };

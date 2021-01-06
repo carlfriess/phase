@@ -6,6 +6,10 @@
 
 #include "fontem.h"
 
+extern const size_t app_icon_mask_width;
+extern const size_t app_icon_mask_height;
+extern const uint8_t app_icon_mask[];
+
 namespace phase {
 namespace ui {
 namespace watch {
@@ -13,18 +17,20 @@ namespace watch {
 NotificationView::NotificationView(const char *title,
                                    const struct font *title_font,
                                    const char *body,
-                                   const struct font *body_font, Frame frame)
+                                   const struct font *body_font,
+                                   const uint8_t *icon, Frame frame)
         : View(frame) {
 
     setOpaque(false);
 
     Frame icon_frame{};
-    icon_frame.width = 60;
-    icon_frame.height = 60;
+    icon_frame.width = app_icon_mask_width;
+    icon_frame.height = app_icon_mask_height;
     icon_frame.origin.x =
             frame.origin.x + (frame.width / 2) - (icon_frame.width / 2);
     icon_frame.origin.y = frame.origin.y;
-    auto icon_view = new View(icon_frame);
+    auto icon_view = new ImageView(icon, icon_frame);
+    icon_view->setMask(app_icon_mask);
 
     Frame content_frame{};
     content_frame.origin.x = frame.origin.x;

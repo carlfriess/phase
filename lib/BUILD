@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@//external/nRF5:nRF5.bzl", "nRF5_copts", "nRF5_linkopts")
+load("@//tools/img:embed.bzl", "embed_mask")
 
 cc_library(
     name = "GC9A01",
@@ -9,6 +10,11 @@ cc_library(
     copts = nRF5_copts,
     includes = ["GC9A01"],
     linkopts = nRF5_linkopts,
+)
+
+embed_mask(
+    name = "app_icon_mask",
+    img = "ui/watch/app_icon_mask.png",
 )
 
 cc_library(
@@ -38,7 +44,9 @@ cc_library(
             "ui/watch/*.h",
         ],
         exclude = ["ui/watch/*_test.cpp"],
-    ),
+    ) + [
+        ":app_icon_mask",
+    ],
     hdrs = ["ui/include/phase-ui-watch.h"],
     copts = nRF5_copts,
     includes = ["ui/include"],
