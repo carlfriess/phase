@@ -24,7 +24,7 @@ Frame clip_frame_to_fit_circle(Frame frame, const Frame &circle) {
 
     // Calculate required margin at the top and bottom edge of the frame;
     Coord margin = horizontal_margin(frame.origin.y + frame.height, circle);
-    margin = max(margin, horizontal_margin(frame.origin.y, circle));
+    margin = std::max(margin, horizontal_margin(frame.origin.y, circle));
 
     // Adjust horizontal bounds
     if (circle.origin.x + margin > frame.origin.x) {

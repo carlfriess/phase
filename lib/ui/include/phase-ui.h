@@ -9,9 +9,6 @@
 #include <vector>
 #include <string>
 
-#define min(a, b)   ((a) < (b) ? (a) : (b))
-#define max(a, b)   ((a) > (b) ? (a) : (b))
-
 // Forward declaration of fontem type
 struct font;
 
@@ -48,10 +45,12 @@ struct Frame {
     }
 
     inline Frame overlap(const Frame &other) const {
-        Coord nX = max(origin.x, other.origin.x);
-        Coord nY = max(origin.y, other.origin.y);
-        Coord nW = min(origin.x + width, other.origin.x + other.width) - nX;
-        Coord nH = min(origin.y + height, other.origin.y + other.height) - nY;
+        Coord nX = std::max(origin.x, other.origin.x);
+        Coord nY = std::max(origin.y, other.origin.y);
+        Coord nW =
+                std::min(origin.x + width, other.origin.x + other.width) - nX;
+        Coord nH =
+                std::min(origin.y + height, other.origin.y + other.height) - nY;
         return {
                 .origin = {nX, nY},
                 .width = nW,
@@ -67,10 +66,12 @@ struct Frame {
     }
 
     inline Frame expand(const Frame &other) const {
-        Coord nX = min(origin.x, other.origin.x);
-        Coord nY = min(origin.y, other.origin.y);
-        Coord nW = max(origin.x + width, other.origin.x + other.width) - nX;
-        Coord nH = max(origin.y + height, other.origin.y + other.height) - nY;
+        Coord nX = std::min(origin.x, other.origin.x);
+        Coord nY = std::min(origin.y, other.origin.y);
+        Coord nW =
+                std::max(origin.x + width, other.origin.x + other.width) - nX;
+        Coord nH =
+                std::max(origin.y + height, other.origin.y + other.height) - nY;
         return {
                 .origin = {nX, nY},
                 .width = nW,
@@ -82,6 +83,7 @@ struct Frame {
 class View {
 public:
     explicit View(Frame frame) : frame(frame) {};
+
     virtual ~View() = default;
 
     virtual void render(uint8_t *buffer, Frame frame) const;
