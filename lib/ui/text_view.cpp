@@ -4,7 +4,6 @@
 
 #include "phase-ui.h"
 
-#include <stdlib.h>
 #include <cstring>
 
 extern "C" {
@@ -70,14 +69,20 @@ void TextView::render(uint8_t *buffer, Frame region) const {
 size_t TextView::setText(const std::string str) {
 
     Coord width = 0;
+    Coord last_ws_width = 0;
     glyph_t prev = 0;
 
     // Iterate string and calculate width until frame width is exceeded
     auto it = str.begin();
+    auto last_ws = it;
     while (it < str.end()) {
 
         // Get next UTF-8 character
         glyph_t cur = utf8::next(it, str.end());
+        if (std::isspace(cur)) {
+            last_ws = it;
+            last_ws_width = width;
+        }
 
         // Lookup the next glyph
         const struct glyph *g = font_get_glyph(font, cur);
@@ -91,7 +96,13 @@ size_t TextView::setText(const std::string str) {
         if (width + gWidth <= frame.width) {
             width += gWidth;
         } else {
-            utf8::prior(it, str.begin());
+            // If we encountered whitespace, jump back to word boundary
+            if (last_ws > str.begin()) {
+                it = last_ws;
+                width = last_ws_width;
+            } else {
+                utf8::prior(it, str.begin());
+            }
             break;
         }
 
