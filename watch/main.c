@@ -11,11 +11,6 @@
 #include "GC9A01.h"
 
 #include "bluetooth.h"
-#include "bluetooth/phase_ble.h"
-#include "bluetooth/phase_gap.h"
-#include "bluetooth/phase_gatt.h"
-#include "bluetooth/phase_peer_manager.h"
-#include "bluetooth/phase_cts.h"
 #include "spi.h"
 #include "ui.h"
 
@@ -52,8 +47,6 @@ void GC9A01_delay(uint16_t ms) {
 
 int main(void) {
 
-    bool erase_bonds;
-
     // Initialize logging
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
@@ -67,16 +60,8 @@ int main(void) {
     // Initialize power management
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
 
-    // Initialize BLE stuff
-    buttons_leds_init(&erase_bonds);
-    ble_stack_init();
-    gap_params_init();
-    gatt_init();
-    db_discovery_init();
-    advertising_init();
-    peer_manager_init();
-    cts_init();
-    conn_params_init();
+    // Initialize Bluetooth stack and services
+    bluetooth_init();
 
     // Initialize display
     nrf_gpio_cfg_output(GC9A01_RES);
@@ -88,7 +73,7 @@ int main(void) {
     ui_update();
 
     // Start advertising
-    advertising_start(erase_bonds);
+    bluetooth_start_advertising(false);
 
     // Main loop
     while (true) {
