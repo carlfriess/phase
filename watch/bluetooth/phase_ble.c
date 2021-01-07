@@ -5,19 +5,37 @@
 #include "phase_ble.h"
 
 #include "app_error.h"
-#include "bsp.h"
 #include "ble.h"
+#include "ble_advertising.h"
+#include "ble_srv_common.h"
+#include "bsp.h"
 #include "nrf_log.h"
 #include "nrf_sdh.h"
 #include "nrf_sdh_ble.h"
 #include "peer_manager_handler.h"
 
-
-#define APP_BLE_CONN_CFG_TAG    1   /**< A tag identifying the SoftDevice BLE configuration. */
-#define APP_BLE_OBSERVER_PRIO   3   /**< Application's BLE observer priority. You shouldn't need to modify this value. */
+#include "phase_peer_manager.h"
 
 
-uint16_t m_cur_conn_handle = BLE_CONN_HANDLE_INVALID;                    /**< Handle of the current connection. */
+#define APP_BLE_CONN_CFG_TAG    1       /**< A tag identifying the SoftDevice BLE configuration. */
+#define APP_BLE_OBSERVER_PRIO   3       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
+
+#define APP_ADV_FAST_INTERVAL   0x0028  /**< Fast advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
+#define APP_ADV_SLOW_INTERVAL   0x0C80  /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
+#define APP_ADV_FAST_DURATION   3000    /**< The advertising duration of fast advertising in units of 10 milliseconds. */
+#define APP_ADV_SLOW_DURATION   18000   /**< The advertising duration of slow advertising in units of 10 milliseconds. */
+
+
+uint16_t m_cur_conn_handle = BLE_CONN_HANDLE_INVALID;   /**< Handle of the current connection. */
+
+BLE_ADVERTISING_DEF(m_advertising);     /**< Advertising module instance. */
+
+static ble_uuid_t m_adv_solicited_uuids[] = {
+        {BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE},
+};
+
+static pm_peer_id_t m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];    /**< List of peers currently in the whitelist. */
+static uint32_t m_whitelist_peer_cnt;
 
 
 /**@brief Function for handling BLE events.
@@ -110,3 +128,141 @@ void ble_stack_init(void) {
                          NULL);
 }
 
+
+/**@brief Function for handling advertising events.
+ *
+ * @details This function will be called for advertising events which are passed
+ * to the application.
+ *
+ * @param[in] ble_adv_evt  Advertising event.
+ */
+static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
+    ret_code_t err_code;
+
+    switch (ble_adv_evt) {
+        case BLE_ADV_EVT_FAST:
+            NRF_LOG_INFO("Fast advertising");
+            break;
+
+        case BLE_ADV_EVT_SLOW:
+            NRF_LOG_INFO("Slow advertising");
+            break;
+
+        case BLE_ADV_EVT_FAST_WHITELIST:
+            NRF_LOG_INFO("Fast advertising with WhiteList");
+            break;
+
+        case BLE_ADV_EVT_SLOW_WHITELIST:
+            NRF_LOG_INFO("Slow advertising with WhiteList");
+            err_code = ble_advertising_restart_without_whitelist(
+                    &m_advertising);
+            APP_ERROR_CHECK(err_code);
+            break;
+
+        case BLE_ADV_EVT_IDLE:
+            // sleep_mode_enter();
+            break;
+
+        case BLE_ADV_EVT_WHITELIST_REQUEST: {
+            ble_gap_addr_t whitelist_addrs[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
+            ble_gap_irk_t whitelist_irks[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
+            uint32_t addr_cnt = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
+            uint32_t irk_cnt = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
+
+            err_code = pm_whitelist_get(whitelist_addrs, &addr_cnt,
+                                        whitelist_irks, &irk_cnt);
+            APP_ERROR_CHECK(err_code);
+            NRF_LOG_DEBUG(
+                    "pm_whitelist_get returns %d addr in whitelist and %d irk whitelist",
+                    addr_cnt,
+                    irk_cnt);
+
+            // Apply the whitelist.
+            err_code = ble_advertising_whitelist_reply(&m_advertising,
+                                                       whitelist_addrs,
+                                                       addr_cnt,
+                                                       whitelist_irks,
+                                                       irk_cnt);
+            APP_ERROR_CHECK(err_code);
+        }
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+/**@brief Function for initializing the advertising functionality.
+ *
+ * @details Encodes the required advertising data and passes it to the stack.
+ * Also builds a structure to be passed to the stack when starting advertising.
+ */
+void advertising_init(void) {
+    ret_code_t err_code;
+    ble_advertising_init_t init;
+
+    memset(&init, 0, sizeof(init));
+
+    init.advdata.name_type = BLE_ADVDATA_FULL_NAME;
+    init.advdata.include_appearance = true;
+    init.advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+    init.advdata.uuids_solicited.uuid_cnt =
+            sizeof(m_adv_solicited_uuids) / sizeof(m_adv_solicited_uuids[0]);
+    init.advdata.uuids_solicited.p_uuids = m_adv_solicited_uuids;
+
+    init.config.ble_adv_whitelist_enabled = true;
+    init.config.ble_adv_fast_enabled = true;
+    init.config.ble_adv_fast_interval = APP_ADV_FAST_INTERVAL;
+    init.config.ble_adv_fast_timeout = APP_ADV_FAST_DURATION;
+    init.config.ble_adv_slow_enabled = true;
+    init.config.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
+    init.config.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
+
+    init.evt_handler = on_adv_evt;
+
+    err_code = ble_advertising_init(&m_advertising, &init);
+    APP_ERROR_CHECK(err_code);
+
+    ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
+}
+
+
+/**@brief Function for starting advertising.
+ */
+void advertising_start(bool erase_bonds) {
+    ret_code_t err_code;
+
+    if (erase_bonds == true) {
+
+        NRF_LOG_INFO("Erase bonds!");
+        err_code = pm_peers_delete();
+        APP_ERROR_CHECK(err_code);
+
+        // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
+
+    } else {
+
+        memset(m_whitelist_peers, PM_PEER_ID_INVALID,
+               sizeof(m_whitelist_peers));
+        m_whitelist_peer_cnt = (sizeof(m_whitelist_peers) /
+                                sizeof(pm_peer_id_t));
+
+        peer_list_get(m_whitelist_peers, &m_whitelist_peer_cnt);
+
+        err_code = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
+        APP_ERROR_CHECK(err_code);
+
+        // Setup the device identies list.
+        // Some SoftDevices do not support this feature.
+        err_code = pm_device_identities_list_set(m_whitelist_peers,
+                                                 m_whitelist_peer_cnt);
+        if (err_code != NRF_ERROR_NOT_SUPPORTED) {
+            APP_ERROR_CHECK(err_code);
+        }
+
+        err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+        APP_ERROR_CHECK(err_code);
+
+    }
+}

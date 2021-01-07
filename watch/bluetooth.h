@@ -7,8 +7,6 @@
 
 #include <stdbool.h>
 
-void advertising_start(bool erase_bonds);
-
 void services_init(void);
 
 void conn_params_init(void);
@@ -16,7 +14,5 @@ void conn_params_init(void);
 void buttons_leds_init(bool *p_erase_bonds);
 
 void peer_manager_init(void);
-
-void advertising_init(void);
 
 #endif //PHASE_BLUETOOTH_H
