@@ -13,6 +13,7 @@
 #include "bluetooth.h"
 #include "bluetooth/phase_ble.h"
 #include "bluetooth/gap.h"
+#include "bluetooth/gatt.h"
 #include "spi.h"
 #include "ui.h"
 
