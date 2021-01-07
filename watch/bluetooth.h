@@ -9,8 +9,6 @@
 
 void advertising_start(bool erase_bonds);
 
-void gap_params_init(void);
-
 void gatt_init(void);
 
 void services_init(void);

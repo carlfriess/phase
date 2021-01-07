@@ -238,6 +238,10 @@
 
 // </h>
 
+// <s> DEVICE_NAME - Advertised device name
+
+#define DEVICE_NAME "Phase Watch"
+
 // <o> NRF_BLE_GQ_QUEUE_SIZE - Queue size for BLE GATT Queue module.
 
 #ifndef NRF_BLE_GQ_QUEUE_SIZE
