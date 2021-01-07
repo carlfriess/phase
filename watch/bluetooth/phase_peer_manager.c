@@ -73,7 +73,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                     // Bonded to a new peer, add it to the whitelist.
                     whitelist[whitelist_len++] = cur_peer;
 
-                    // The whitelist has been modified, update it in the Peer Manager.
+                    // Update the whitelist in the Peer Manager.
                     err_code = pm_device_identities_list_set(whitelist,
                                                              whitelist_len);
                     if (err_code != NRF_ERROR_NOT_SUPPORTED) {

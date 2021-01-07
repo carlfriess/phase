@@ -128,6 +128,10 @@ static void on_cts_c_evt(ble_cts_c_t *p_cts, ble_cts_c_evt_t *p_evt) {
             err_code = ble_cts_c_handles_assign(&cts, p_evt->conn_handle,
                                                 &p_evt->params.char_handles);
             APP_ERROR_CHECK(err_code);
+
+            // Automatically request the time from the server
+            err_code = ble_cts_c_current_time_read(get_cts());
+            APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_CTS_C_EVT_DISCOVERY_FAILED:
