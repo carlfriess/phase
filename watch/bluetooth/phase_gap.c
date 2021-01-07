@@ -59,6 +59,13 @@ void gap_params_init(void) {
 }
 
 
+/**@brief Function for handling the Connection Parameters module.
+ *
+ * @param[in] p_evt  Event received from the Connection Parameters module.
+ */
+static void conn_params_evt_handler(ble_conn_params_evt_t *p_evt) {}
+
+
 /**@brief Function for handling a Connection Parameters error.
  *
  * @param[in]   nrf_error   Error code containing information about the error.
@@ -83,6 +90,7 @@ void conn_params_init(void) {
     cp_init.max_conn_params_update_count = MAX_CONN_PARAMS_UPDATE_COUNT;
     cp_init.start_on_notify_cccd_handle = BLE_GATT_HANDLE_INVALID;
     cp_init.disconnect_on_fail = true;
+    cp_init.evt_handler = conn_params_evt_handler;
     cp_init.error_handler = conn_params_error_handler;
 
     err_code = ble_conn_params_init(&cp_init);
