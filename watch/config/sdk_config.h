@@ -42,16 +42,15 @@
 
 #ifndef SDK_CONFIG_H
 #define SDK_CONFIG_H
-// <<< Use Configuration Wizard in Context Menu >>>\n
+// <<< Use Configuration Wizard in Context Menu >>>
 #ifdef USE_APP_CONFIG
 #include "app_config.h"
 #endif
+
 // <h> Application
 
-//==========================================================
-// <h> PIN_CONFIGURATION - Pin configuration
+// <h> Pin configuration
 
-//==========================================================
 // <o> GC9A01_SCL  - Pin number
 
 // <0=> 0 (P0.0)
@@ -86,13 +85,9 @@
 // <29=> 29 (P0.29)
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
-// <4294967295=> Not connected
 
-#ifndef GC9A01_SCL
 #define GC9A01_SCL 28
-#endif
 
-//==========================================================
 // <o> GC9A01_SDA  - Pin number
 
 // <0=> 0 (P0.0)
@@ -127,13 +122,9 @@
 // <29=> 29 (P0.29)
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
-// <4294967295=> Not connected
 
-#ifndef GC9A01_SDA
 #define GC9A01_SDA 29
-#endif
 
-//==========================================================
 // <o> GC9A01_RES  - Pin number
 
 // <0=> 0 (P0.0)
@@ -168,13 +159,9 @@
 // <29=> 29 (P0.29)
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
-// <4294967295=> Not connected
 
-#ifndef GC9A01_RES
 #define GC9A01_RES 3
-#endif
 
-//==========================================================
 // <o> GC9A01_DC  - Pin number
 
 // <0=> 0 (P0.0)
@@ -209,13 +196,9 @@
 // <29=> 29 (P0.29)
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
-// <4294967295=> Not connected
 
-#ifndef GC9A01_DC
 #define GC9A01_DC 4
-#endif
 
-//==========================================================
 // <o> GC9A01_CS  - Pin number
 
 // <0=> 0 (P0.0)
@@ -250,22 +233,19 @@
 // <29=> 29 (P0.29)
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
-// <4294967295=> Not connected
 
-#ifndef GC9A01_CS
 #define GC9A01_CS 31
-#endif
 
 // </h>
-//==========================================================
 
-//==========================================================
-// <o> NRF_BLE_GQ_QUEUE_SIZE - Queue size for BLE GATT Queue module. 
+// <o> NRF_BLE_GQ_QUEUE_SIZE - Queue size for BLE GATT Queue module.
+
 #ifndef NRF_BLE_GQ_QUEUE_SIZE
 #define NRF_BLE_GQ_QUEUE_SIZE 4
 #endif
 
-// </h> 
+// </h>
+
 //==========================================================
 
 // <h> Board Support 
