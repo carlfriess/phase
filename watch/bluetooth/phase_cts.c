@@ -8,36 +8,9 @@
 #include "ble_cts_c.h"
 #include "nrf_log.h"
 
+#include "phase_bluetooth_handlers.h"
 #include "phase_gatt.h"
-#include "../ui.h"
 
-
-static char const *day_of_week[] = {
-        "Unknown",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday"
-};
-
-static char const *month_of_year[] = {
-        "Unknown",
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-};
 
 // Current Time Service client instance
 BLE_CTS_C_DEF(cts);
@@ -49,66 +22,21 @@ ble_cts_c_t *get_cts(void) {
     return &cts;
 }
 
+static void parse_cts_time(exact_time_256_t time) {
 
-/**@brief Function for handling the Current Time Service errors.
- *
- * @param[in] p_evt  Event received from the Current Time Service client.
- */
-static void current_time_print(ble_cts_c_evt_t *p_evt) {
-    NRF_LOG_INFO("\r\nCurrent Time:");
-    NRF_LOG_INFO("\r\nDate:");
+    struct tm time_struct;
+    time_struct.tm_year = time.day_date_time.date_time.year - 1900;
+    time_struct.tm_mon = time.day_date_time.date_time.month - 1;
+    time_struct.tm_mday = time.day_date_time.date_time.day;
+    time_struct.tm_hour = time.day_date_time.date_time.hours;
+    time_struct.tm_min = time.day_date_time.date_time.minutes;
+    time_struct.tm_sec = time.day_date_time.date_time.seconds;
 
-    NRF_LOG_INFO("\tDay of week   %s", (uint32_t) day_of_week[p_evt->
-            params.
-            current_time.
-            exact_time_256.
-            day_date_time.
-            day_of_week]);
-
-    if (p_evt->params.current_time.exact_time_256.day_date_time.date_time.day ==
-        0) {
-        NRF_LOG_INFO("\tDay of month  Unknown");
-    } else {
-        NRF_LOG_INFO("\tDay of month  %i",
-                     p_evt->params.current_time.exact_time_256.day_date_time.date_time.day);
+    time_t timestamp = mktime(&time_struct);
+    if (timestamp >= 0) {
+        bluetooth_time_handler(mktime(&time_struct));
     }
 
-    NRF_LOG_INFO("\tMonth of year %s",
-                 (uint32_t) month_of_year[p_evt->params.current_time.exact_time_256.day_date_time.date_time.month]);
-    if (p_evt->params.current_time.exact_time_256.day_date_time.date_time.year ==
-        0) {
-        NRF_LOG_INFO("\tYear          Unknown");
-    } else {
-        NRF_LOG_INFO("\tYear          %i",
-                     p_evt->params.current_time.exact_time_256.day_date_time.date_time.year);
-    }
-    NRF_LOG_INFO("\r\nTime:");
-    NRF_LOG_INFO("\tHours     %i",
-                 p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours);
-    NRF_LOG_INFO("\tMinutes   %i",
-                 p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes);
-    NRF_LOG_INFO("\tSeconds   %i",
-                 p_evt->params.current_time.exact_time_256.day_date_time.date_time.seconds);
-    NRF_LOG_INFO("\tFractions %i/256 of a second",
-                 p_evt->params.current_time.exact_time_256.fractions256);
-
-    NRF_LOG_INFO("\r\nAdjust reason:\r");
-    NRF_LOG_INFO("\tDaylight savings %x",
-                 p_evt->params.current_time.adjust_reason.change_of_daylight_savings_time);
-    NRF_LOG_INFO("\tTime zone        %x",
-                 p_evt->params.current_time.adjust_reason.change_of_time_zone);
-    NRF_LOG_INFO("\tExternal update  %x",
-                 p_evt->params.current_time.adjust_reason.external_reference_time_update);
-    NRF_LOG_INFO("\tManual update    %x",
-                 p_evt->params.current_time.adjust_reason.manual_time_update);
-
-    ui_set_time(
-            p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours,
-            p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes);
-    ui_set_date(
-            day_of_week[p_evt->params.current_time.exact_time_256.day_date_time.day_of_week],
-            p_evt->params.current_time.exact_time_256.day_date_time.date_time.day,
-            month_of_year[p_evt->params.current_time.exact_time_256.day_date_time.date_time.month]);
 }
 
 
@@ -151,7 +79,7 @@ static void on_cts_c_evt(ble_cts_c_t *p_cts, ble_cts_c_evt_t *p_evt) {
 
         case BLE_CTS_C_EVT_CURRENT_TIME:
             NRF_LOG_INFO("Current Time received.");
-            current_time_print(p_evt);
+            parse_cts_time(p_evt->params.current_time.exact_time_256);
             break;
 
         case BLE_CTS_C_EVT_INVALID_TIME:

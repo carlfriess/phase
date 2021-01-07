@@ -131,6 +131,35 @@ void ui_update(void) {
 
 }
 
+void ui_set_datetime(time_t time) {
+    static const std::string weekdays[] = {
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+    };
+    static const std::string months[] = {
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+    };
+    struct tm *time_struct = localtime(&time);
+    ui_set_time(time_struct->tm_hour, time_struct->tm_min);
+    ui_set_date(weekdays[time_struct->tm_wday].c_str(), time_struct->tm_mday,
+                months[time_struct->tm_mon].c_str());
+}
+
 void ui_set_time(uint8_t hr, uint8_t min) {
     char str[6];
     snprintf(str, sizeof(str), "%02d:%02d", hr, min);

@@ -7,6 +7,9 @@
 
 #include <stdbool.h>
 
+// Include callback definitions
+#include "bluetooth/phase_bluetooth_handlers.h"
+
 /**@brief Function for initializing the Bluetooth stack and services.
  */
 void bluetooth_init(void);

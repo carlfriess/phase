@@ -45,6 +45,10 @@ void GC9A01_delay(uint16_t ms) {
     nrf_delay_ms(ms);
 }
 
+void bluetooth_time_handler(time_t time) {
+    ui_set_datetime(time);
+}
+
 int main(void) {
 
     // Initialize logging
