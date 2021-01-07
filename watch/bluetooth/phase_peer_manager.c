@@ -36,6 +36,7 @@ uint32_t whitelist_len;
  * @param[in] p_evt  Peer Manager event.
  */
 static void pm_evt_handler(pm_evt_t const *p_evt) {
+
     ret_code_t err_code;
 
     pm_handler_on_pm_evt(p_evt);
@@ -57,9 +58,10 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
 
         case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
             // Note: You should check on what kind of white list policy your application should use.
-            if (p_evt->params.peer_data_update_succeeded.flash_changed
-                && (p_evt->params.peer_data_update_succeeded.data_id ==
-                    PM_PEER_DATA_ID_BONDING)) {
+            if (p_evt->params.peer_data_update_succeeded.flash_changed &&
+                (p_evt->params.peer_data_update_succeeded.data_id ==
+                 PM_PEER_DATA_ID_BONDING)) {
+
                 NRF_LOG_DEBUG(
                         "New Bond, add the peer to the whitelist if possible");
                 NRF_LOG_DEBUG("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d",
@@ -83,20 +85,23 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                     APP_ERROR_CHECK(err_code);
 
                 }
+
             }
             break;
 
         default:
             break;
     }
+
 }
 
 
 /**@brief Function for the Peer Manager initialization.
  */
 void peer_manager_init(void) {
-    ble_gap_sec_params_t sec_param;
+
     ret_code_t err_code;
+    ble_gap_sec_params_t sec_param;
 
     err_code = pm_init();
     APP_ERROR_CHECK(err_code);
@@ -122,6 +127,7 @@ void peer_manager_init(void) {
 
     err_code = pm_register(pm_evt_handler);
     APP_ERROR_CHECK(err_code);
+
 }
 
 
@@ -132,6 +138,7 @@ void peer_manager_init(void) {
  *                         Out: The number of peers copied in the buffer.
  */
 void peer_list_get(pm_peer_id_t *p_peers, uint32_t *p_size) {
+
     pm_peer_id_t peer_id;
     uint32_t n = (*p_size < BLE_GAP_WHITELIST_ADDR_MAX_COUNT) ?
                  *p_size : BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
@@ -140,4 +147,5 @@ void peer_list_get(pm_peer_id_t *p_peers, uint32_t *p_size) {
                       PM_PEER_ID_INVALID && *p_size < n; (*p_size)++) {
         p_peers[*p_size] = peer_id;
     }
+
 }

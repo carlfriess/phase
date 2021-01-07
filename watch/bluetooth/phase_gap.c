@@ -31,6 +31,7 @@
  * preferred connection parameters.
  */
 void gap_params_init(void) {
+
     ret_code_t err_code;
     ble_gap_conn_params_t gap_conn_params;
     ble_gap_conn_sec_mode_t sec_mode;
@@ -54,6 +55,7 @@ void gap_params_init(void) {
 
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
+
 }
 
 
@@ -69,6 +71,7 @@ static void conn_params_error_handler(uint32_t nrf_error) {
 /**@brief Function for initializing the Connection Parameters module.
  */
 void conn_params_init(void) {
+
     ret_code_t err_code;
     ble_conn_params_init_t cp_init;
 
@@ -84,4 +87,5 @@ void conn_params_init(void) {
 
     err_code = ble_conn_params_init(&cp_init);
     APP_ERROR_CHECK(err_code);
+
 }

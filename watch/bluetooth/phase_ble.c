@@ -8,7 +8,6 @@
 #include "ble.h"
 #include "ble_advertising.h"
 #include "ble_srv_common.h"
-#include "bsp.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_log.h"
 #include "nrf_sdh.h"
@@ -49,6 +48,7 @@ static ble_uuid_t m_adv_solicited_uuids[] = {
  * @param[in]   p_context   Unused.
  */
 static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
+
     ret_code_t err_code;
 
     pm_handler_secure_on_connection(p_ble_evt);
@@ -103,6 +103,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
             // No implementation needed.
             break;
     }
+
 }
 
 
@@ -124,6 +125,7 @@ static void nrf_qwr_error_handler(uint32_t nrf_error) {
  * parameters from sdk_config.h.
  */
 void ble_stack_init(void) {
+
     ret_code_t err_code;
     nrf_ble_qwr_init_t qwr_init = {0};
 
@@ -160,6 +162,7 @@ void ble_stack_init(void) {
  * @param[in] ble_adv_evt  Advertising event.
  */
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
+
     ret_code_t err_code;
 
     switch (ble_adv_evt) {
@@ -213,6 +216,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
         default:
             break;
     }
+
 }
 
 
@@ -222,6 +226,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
  * Also builds a structure to be passed to the stack when starting advertising.
  */
 void advertising_init(void) {
+
     ret_code_t err_code;
     ble_advertising_init_t init;
 
@@ -248,12 +253,14 @@ void advertising_init(void) {
     APP_ERROR_CHECK(err_code);
 
     ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
+
 }
 
 
 /**@brief Function for starting advertising.
  */
 void advertising_start(bool erase_bonds) {
+
     ret_code_t err_code;
 
     if (erase_bonds == true) {
@@ -285,4 +292,5 @@ void advertising_start(bool erase_bonds) {
         APP_ERROR_CHECK(err_code);
 
     }
+
 }

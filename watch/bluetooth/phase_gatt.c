@@ -39,8 +39,7 @@ ble_db_discovery_t *get_discovery_db(void) {
 /**@brief Function for initializing the GATT module.
  */
 void gatt_init(void) {
-    ret_code_t err_code = nrf_ble_gatt_init(&gatt, NULL);
-    APP_ERROR_CHECK(err_code);
+    APP_ERROR_CHECK(nrf_ble_gatt_init(&gatt, NULL));
 }
 
 
@@ -61,6 +60,7 @@ static void db_disc_handler(ble_db_discovery_evt_t *p_evt) {
  * @brief Database discovery collector initialization.
  */
 void db_discovery_init(void) {
+
     ble_db_discovery_init_t db_init;
 
     memset(&db_init, 0, sizeof(ble_db_discovery_init_t));
@@ -70,4 +70,5 @@ void db_discovery_init(void) {
 
     ret_code_t err_code = ble_db_discovery_init(&db_init);
     APP_ERROR_CHECK(err_code);
+
 }
