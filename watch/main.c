@@ -11,6 +11,7 @@
 #include "GC9A01.h"
 
 #include "bluetooth.h"
+#include "bluetooth/phase_ble.h"
 #include "spi.h"
 #include "ui.h"
 

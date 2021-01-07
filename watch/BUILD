@@ -9,11 +9,14 @@ embed_img(
 )
 
 nRF5_binary(
-    srcs = glob([
-        "*.c",
-        "*.cpp",
-        "*.h",
-    ]) + [
+    srcs = glob(
+        [
+            "**/*.c",
+            "**/*.cpp",
+            "**/*.h",
+        ],
+        exclude = ["config/*"]
+    ) + [
         ":background",
         "@nRF5//:components/ble/ble_advertising/ble_advertising.c",
         "@nRF5//:components/ble/ble_db_discovery/ble_db_discovery.c",
