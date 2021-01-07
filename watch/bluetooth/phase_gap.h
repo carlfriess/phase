@@ -2,8 +2,8 @@
 // Created by Carl Friess on 07/01/2021.
 //
 
-#ifndef PHASE_GAP_H
-#define PHASE_GAP_H
+#ifndef PHASE_PHASE_GAP_H
+#define PHASE_PHASE_GAP_H
 
 /**@brief Function for the GAP initialization.
  *
@@ -13,4 +13,8 @@
  */
 void gap_params_init(void);
 
-#endif //PHASE_GAP_H
+/**@brief Function for initializing the Connection Parameters module.
+ */
+void conn_params_init(void);
+
+#endif //PHASE_PHASE_GAP_H

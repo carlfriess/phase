@@ -7,6 +7,8 @@
 
 #include <stdbool.h>
 
+#include "nrf_ble_qwr.h"
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt. Uses

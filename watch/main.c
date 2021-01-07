@@ -12,8 +12,10 @@
 
 #include "bluetooth.h"
 #include "bluetooth/phase_ble.h"
-#include "bluetooth/gap.h"
-#include "bluetooth/gatt.h"
+#include "bluetooth/phase_gap.h"
+#include "bluetooth/phase_gatt.h"
+#include "bluetooth/phase_peer_manager.h"
+#include "bluetooth/phase_cts.h"
 #include "spi.h"
 #include "ui.h"
 
@@ -73,7 +75,7 @@ int main(void) {
     db_discovery_init();
     advertising_init();
     peer_manager_init();
-    services_init();
+    cts_init();
     conn_params_init();
 
     // Initialize display

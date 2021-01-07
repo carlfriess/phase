@@ -9,11 +9,13 @@
 #include "ble_advertising.h"
 #include "ble_srv_common.h"
 #include "bsp.h"
+#include "nrf_ble_qwr.h"
 #include "nrf_log.h"
 #include "nrf_sdh.h"
 #include "nrf_sdh_ble.h"
 #include "peer_manager_handler.h"
 
+#include "phase_cts.h"
 #include "phase_peer_manager.h"
 
 
@@ -26,16 +28,19 @@
 #define APP_ADV_SLOW_DURATION   18000   /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
 
-uint16_t m_cur_conn_handle = BLE_CONN_HANDLE_INVALID;   /**< Handle of the current connection. */
+// Handle of the current connection
+uint16_t cur_conn = BLE_CONN_HANDLE_INVALID;
 
-BLE_ADVERTISING_DEF(m_advertising);     /**< Advertising module instance. */
+// Advertising module instance
+BLE_ADVERTISING_DEF(m_advertising);
 
+// Queued Write module context
+NRF_BLE_QWR_DEF(ble_qwr);
+
+// Solicited UUIDs for advertising
 static ble_uuid_t m_adv_solicited_uuids[] = {
         {BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE},
 };
-
-static pm_peer_id_t m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];    /**< List of peers currently in the whitelist. */
-static uint32_t m_whitelist_peer_cnt;
 
 
 /**@brief Function for handling BLE events.
@@ -51,17 +56,16 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_CONNECTED:
             NRF_LOG_INFO("Connected.");
-            m_cur_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-            err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr,
-                                                      m_cur_conn_handle);
+            cur_conn = p_ble_evt->evt.gap_evt.conn_handle;
+            err_code = nrf_ble_qwr_conn_handle_assign(&ble_qwr, cur_conn);
             APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected.");
-            m_cur_conn_handle = BLE_CONN_HANDLE_INVALID;
-            if (p_ble_evt->evt.gap_evt.conn_handle == m_cts_c.conn_handle) {
-                m_cts_c.conn_handle = BLE_CONN_HANDLE_INVALID;
+            cur_conn = BLE_CONN_HANDLE_INVALID;
+            if (p_ble_evt->evt.gap_evt.conn_handle == get_cts()->conn_handle) {
+                get_cts()->conn_handle = BLE_CONN_HANDLE_INVALID;
             }
             break;
 
@@ -102,6 +106,18 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 }
 
 
+/**@brief Function for handling Queued Write Module errors.
+ *
+ * @details A pointer to this function will be passed to each service which may
+ * need to inform the application about an error.
+ *
+ * @param[in]   nrf_error   Error code containing information about the error.
+ */
+static void nrf_qwr_error_handler(uint32_t nrf_error) {
+    APP_ERROR_HANDLER(nrf_error);
+}
+
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt. Uses
@@ -109,6 +125,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
  */
 void ble_stack_init(void) {
     ret_code_t err_code;
+    nrf_ble_qwr_init_t qwr_init = {0};
 
     err_code = nrf_sdh_enable_request();
     APP_ERROR_CHECK(err_code);
@@ -126,6 +143,12 @@ void ble_stack_init(void) {
     // Register a handler for BLE events.
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler,
                          NULL);
+
+    // Initialize Queued Write Module
+    qwr_init.error_handler = nrf_qwr_error_handler;
+    err_code = nrf_ble_qwr_init(&ble_qwr, &qwr_init);
+    APP_ERROR_CHECK(err_code);
+
 }
 
 
@@ -184,8 +207,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
                                                        whitelist_irks,
                                                        irk_cnt);
             APP_ERROR_CHECK(err_code);
-        }
             break;
+        }
 
         default:
             break;
@@ -235,28 +258,25 @@ void advertising_start(bool erase_bonds) {
 
     if (erase_bonds == true) {
 
+        // Delete peers in peer manager
+        // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
         NRF_LOG_INFO("Erase bonds!");
         err_code = pm_peers_delete();
         APP_ERROR_CHECK(err_code);
 
-        // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
-
     } else {
 
-        memset(m_whitelist_peers, PM_PEER_ID_INVALID,
-               sizeof(m_whitelist_peers));
-        m_whitelist_peer_cnt = (sizeof(m_whitelist_peers) /
-                                sizeof(pm_peer_id_t));
+        // Update whitelist
+        memset(whitelist, PM_PEER_ID_INVALID, sizeof(whitelist));
+        whitelist_len = (sizeof(whitelist) / sizeof(pm_peer_id_t));
+        peer_list_get(whitelist, &whitelist_len);
 
-        peer_list_get(m_whitelist_peers, &m_whitelist_peer_cnt);
-
-        err_code = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
+        err_code = pm_whitelist_set(whitelist, whitelist_len);
         APP_ERROR_CHECK(err_code);
 
-        // Setup the device identies list.
+        // Setup the device identities list.
         // Some SoftDevices do not support this feature.
-        err_code = pm_device_identities_list_set(m_whitelist_peers,
-                                                 m_whitelist_peer_cnt);
+        err_code = pm_device_identities_list_set(whitelist, whitelist_len);
         if (err_code != NRF_ERROR_NOT_SUPPORTED) {
             APP_ERROR_CHECK(err_code);
         }
