@@ -11,6 +11,7 @@
 #include "GC9A01.h"
 
 #include "bluetooth.h"
+#include "datetime.h"
 #include "spi.h"
 #include "ui.h"
 
@@ -46,6 +47,7 @@ void GC9A01_delay(uint16_t ms) {
 }
 
 void bluetooth_time_handler(time_t time) {
+    datetime_set(time);
     ui_set_datetime(time);
 }
 
