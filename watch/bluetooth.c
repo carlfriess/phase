@@ -53,8 +53,11 @@
  *
  */
 
+#include "bluetooth.h"
+
 #include <stdint.h>
 #include <string.h>
+
 #include "nrf.h"
 #include "app_error.h"
 #include "app_scheduler.h"
@@ -112,13 +115,6 @@
 #define SEC_PARAM_OOB                   0                                           /**< Out Of Band data availability. */
 #define SEC_PARAM_MIN_KEY_SIZE          7                                           /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                          /**< Maximum encryption key size. */
-
-#define SCHED_MAX_EVENT_DATA_SIZE APP_TIMER_SCHED_EVENT_DATA_SIZE                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
-#ifdef SVCALL_AS_NORMAL_FUNCTION
-#define SCHED_QUEUE_SIZE                20                                          /**< Maximum number of events in the scheduler queue. More is needed in case of Serialization. */
-#else
-#define SCHED_QUEUE_SIZE                10                                          /**< Maximum number of events in the scheduler queue. */
-#endif
 
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
@@ -396,19 +392,6 @@ static void current_time_print(ble_cts_c_evt_t * p_evt)
             day_of_week[p_evt->params.current_time.exact_time_256.day_date_time.day_of_week],
             p_evt->params.current_time.exact_time_256.day_date_time.date_time.day,
             month_of_year[p_evt->params.current_time.exact_time_256.day_date_time.date_time.month]);
-}
-
-
-/**@brief Function for the timer initialization.
- *
- * @details Initializes the timer module.
- */
-void timers_init(void)
-{
-    ret_code_t err_code;
-
-    err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -840,14 +823,6 @@ void ble_stack_init(void)
 
     // Register a handler for BLE events.
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
-}
-
-
-/**@brief Function for the Event Scheduler initialization.
- */
-void scheduler_init(void)
-{
-    APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
 }
 
 

@@ -1,4 +1,5 @@
 #include "app_scheduler.h"
+#include "app_timer.h"
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 #include "nrf_log.h"
@@ -13,26 +14,15 @@
 #include "spi.h"
 #include "ui.h"
 
-static void log_init(void) {
-    ret_code_t err_code = NRF_LOG_INIT(NULL);
-    APP_ERROR_CHECK(err_code);
 
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
-}
+// Scheduler configuration parameters
+#define SCHED_MAX_EVENT_DATA_SIZE   APP_TIMER_SCHED_EVENT_DATA_SIZE    /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
+#ifdef SVCALL_AS_NORMAL_FUNCTION
+#define SCHED_QUEUE_SIZE            20                                  /**< Maximum number of events in the scheduler queue. More is needed in case of Serialization. */
+#else
+#define SCHED_QUEUE_SIZE            10                                  /**< Maximum number of events in the scheduler queue. */
+#endif
 
-static void power_management_init(void) {
-    ret_code_t err_code;
-    err_code = nrf_pwr_mgmt_init();
-    APP_ERROR_CHECK(err_code);
-}
-
-static void idle_state_handle(void) {
-    app_sched_execute();
-    ui_update();
-    if (NRF_LOG_PROCESS() == false) {
-        nrf_pwr_mgmt_run();
-    }
-}
 
 void GC9A01_set_reset(uint8_t val) {
     nrf_gpio_pin_write(GC9A01_RES, val);
@@ -59,12 +49,21 @@ int main(void) {
 
     bool erase_bonds;
 
+    // Initialize logging
+    APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+
+    // Initialize app timer
+    APP_ERROR_CHECK(app_timer_init());
+
+    // Initialize event scheduler
+    APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
+
+    // Initialize power management
+    APP_ERROR_CHECK(nrf_pwr_mgmt_init());
+
     // Initialize BLE stuff
-    log_init();
-    timers_init();
     buttons_leds_init(&erase_bonds);
-    scheduler_init();
-    power_management_init();
     ble_stack_init();
     gap_params_init();
     gatt_init();
@@ -87,8 +86,19 @@ int main(void) {
     advertising_start(erase_bonds);
 
     // Main loop
-    for (;;) {
-        idle_state_handle();
+    while (true) {
+
+        // Execute event scheduler
+        app_sched_execute();
+
+        // Update UI
+        ui_update();
+
+        // Process log messages
+        if (!NRF_LOG_PROCESS()) {
+            nrf_pwr_mgmt_run();
+        }
+
     }
 
 }
