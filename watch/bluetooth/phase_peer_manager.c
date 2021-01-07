@@ -139,12 +139,13 @@ void peer_manager_init(void) {
  */
 void peer_list_get(pm_peer_id_t *p_peers, uint32_t *p_size) {
 
-    pm_peer_id_t peer_id;
+    pm_peer_id_t peer_id = PM_PEER_ID_INVALID;
     uint32_t n = (*p_size < BLE_GAP_WHITELIST_ADDR_MAX_COUNT) ?
                  *p_size : BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
 
-    for (*p_size = 0; (peer_id = pm_next_peer_id_get(PM_PEER_ID_INVALID)) !=
-                      PM_PEER_ID_INVALID && *p_size < n; (*p_size)++) {
+    for (*p_size = 0;
+         (peer_id = pm_next_peer_id_get(peer_id)) != PM_PEER_ID_INVALID &&
+         *p_size < n; (*p_size)++) {
         p_peers[*p_size] = peer_id;
     }
 
