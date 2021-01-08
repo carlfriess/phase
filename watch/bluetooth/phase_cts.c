@@ -52,7 +52,6 @@ static void on_cts_c_evt(ble_cts_c_t *p_cts, ble_cts_c_evt_t *p_evt) {
 
     switch (p_evt->evt_type) {
         case BLE_CTS_C_EVT_DISCOVERY_COMPLETE:
-            NRF_LOG_INFO("Current Time Service discovered on server.");
             err_code = ble_cts_c_handles_assign(&cts, p_evt->conn_handle,
                                                 &p_evt->params.char_handles);
             APP_ERROR_CHECK(err_code);

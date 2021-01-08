@@ -185,10 +185,6 @@ static void ancs_c_evt_handler(ble_ancs_c_evt_t *p_evt) {
 
     switch (p_evt->evt_type) {
         case BLE_ANCS_C_EVT_DISCOVERY_COMPLETE:
-
-            NRF_LOG_DEBUG("Apple Notification Center Service discovered on the "
-                          "server.");
-
             ret = nrf_ble_ancs_c_handles_assign(&ancs, p_evt->conn_handle,
                                                 &p_evt->service);
             APP_ERROR_CHECK(ret);
@@ -202,8 +198,6 @@ static void ancs_c_evt_handler(ble_ancs_c_evt_t *p_evt) {
 
             ret = ble_ancs_c_data_source_notif_enable(&ancs);
             APP_ERROR_CHECK(ret);
-
-            NRF_LOG_DEBUG("Notifications Enabled.");
             break;
 
         case BLE_ANCS_C_EVT_NOTIF:
