@@ -4,6 +4,8 @@
 
 #include "bluetooth.h"
 
+#include "app_error.h"
+
 #include "bluetooth/phase_ble.h"
 #include "bluetooth/phase_gap.h"
 #include "bluetooth/phase_gatt.h"
@@ -30,4 +32,14 @@ void bluetooth_init(void) {
  */
 void bluetooth_start_advertising(bool erase_bonds) {
     advertising_start(erase_bonds);
+}
+
+
+/**@brief Request current time from Current Time Service.
+ */
+void bluetooth_request_time(void) {
+    ret_code_t err = ble_cts_c_current_time_read(get_cts());
+    if (err != NRF_ERROR_NOT_FOUND) {
+        APP_ERROR_CHECK(err);
+    }
 }

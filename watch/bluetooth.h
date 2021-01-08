@@ -20,4 +20,8 @@ void bluetooth_init(void);
  */
 void bluetooth_start_advertising(bool erase_bonds);
 
+/**@brief Request current time from Current Time Service.
+ */
+void bluetooth_request_time(void);
+
 #endif //PHASE_BLUETOOTH_H

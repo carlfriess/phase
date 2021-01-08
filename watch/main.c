@@ -25,6 +25,9 @@
 #endif
 
 
+APP_TIMER_DEF(time_sync_timer);
+
+
 void GC9A01_set_reset(uint8_t val) {
     nrf_gpio_pin_write(GC9A01_RES, val);
 }
@@ -51,23 +54,40 @@ void bluetooth_time_handler(time_t time) {
     ui_set_datetime(time);
 }
 
+static void time_sync_handler(void *ctx) {
+    bluetooth_request_time();
+}
+
 int main(void) {
 
+    ret_code_t err;
+
     // Initialize logging
-    APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+    err = NRF_LOG_INIT(NULL);
+    APP_ERROR_CHECK(err);
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 
     // Initialize app timer
-    APP_ERROR_CHECK(app_timer_init());
+    err = app_timer_init();
+    APP_ERROR_CHECK(err);
 
     // Initialize event scheduler
     APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
 
     // Initialize power management
-    APP_ERROR_CHECK(nrf_pwr_mgmt_init());
+    err = nrf_pwr_mgmt_init();
+    APP_ERROR_CHECK(err);
 
     // Initialize Bluetooth stack and services
     bluetooth_init();
+
+    // Use an app timer to synchronize time hourly
+    err = app_timer_create(&time_sync_timer, APP_TIMER_MODE_REPEATED,
+                           time_sync_handler);
+    APP_ERROR_CHECK(err);
+    err = app_timer_start(time_sync_timer, APP_TIMER_TICKS(60 * 60 * 1000),
+                          NULL);
+    APP_ERROR_CHECK(err);
 
     // Initialize display
     nrf_gpio_cfg_output(GC9A01_RES);

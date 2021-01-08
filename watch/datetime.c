@@ -11,6 +11,8 @@
 
 
 #define TICK_INTERVAL   60  // seconds
+
+
 APP_TIMER_DEF(datetime_timer);
 
 static time_t current_time = 0;
