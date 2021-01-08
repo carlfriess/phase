@@ -15,7 +15,7 @@
 #include "font-quicksand-64.h"
 #include "font-opensans-12.h"
 
-#define NRF_LOG_UI_FRAME(frame) NRF_LOG_INFO("(%d, %d) %d %d", frame.origin.x, frame.origin.y, frame.width, frame.height)
+#define NRF_LOG_UI_FRAME(frame) NRF_LOG_DEBUG("(%d, %d) %d %d", frame.origin.x, frame.origin.y, frame.width, frame.height)
 
 #define CHUNK_SIZE  8
 #define IMG_BUF_AREA    (240 * CHUNK_SIZE)
@@ -76,7 +76,7 @@ void ui_update(void) {
     if (dirty.width <= 0 || dirty.height <= 0) {
         return;
     }
-    NRF_LOG_INFO("Updating UI region:");
+    NRF_LOG_DEBUG("Updating UI region:");
     NRF_LOG_UI_FRAME(dirty);
 
     // Set the display memory write area
