@@ -62,7 +62,6 @@ static void on_cts_c_evt(ble_cts_c_t *p_cts, ble_cts_c_evt_t *p_evt) {
             break;
 
         case BLE_CTS_C_EVT_DISCOVERY_FAILED:
-            NRF_LOG_INFO("Current Time Service not found on server. ");
             // CTS not found in this case we just disconnect. There is no reason to stay
             // in the connection for this simple app since it all wants is to interact with CT
             if (p_evt->conn_handle != BLE_CONN_HANDLE_INVALID) {
@@ -73,11 +72,9 @@ static void on_cts_c_evt(ble_cts_c_t *p_cts, ble_cts_c_evt_t *p_evt) {
             break;
 
         case BLE_CTS_C_EVT_DISCONN_COMPLETE:
-            NRF_LOG_INFO("Disconnect Complete.");
             break;
 
         case BLE_CTS_C_EVT_CURRENT_TIME:
-            NRF_LOG_INFO("Current Time received.");
             parse_cts_time(p_evt->params.current_time.exact_time_256);
             break;
 
