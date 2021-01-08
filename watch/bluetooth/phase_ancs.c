@@ -53,30 +53,31 @@ static void notif_attr_print(ble_ancs_c_attr_t *p_attr) {
 }
 
 
-/**@brief Function for printing out errors that originated from the Notification Provider (iOS).
+/**@brief Function for printing out errors that originated from the Notification
+ * Provider (iOS).
  *
  * @param[in] err_code_np Error code received from NP.
  */
 static void err_code_print(uint16_t err_code_np) {
     switch (err_code_np) {
         case BLE_ANCS_NP_UNKNOWN_COMMAND:
-            NRF_LOG_INFO(
-                    "Error: Command ID was not recognized by the Notification Provider. ");
+            NRF_LOG_WARNING("ANCS error: Command ID was not recognized by the "
+                            "Notification Provider");
             break;
 
         case BLE_ANCS_NP_INVALID_COMMAND:
-            NRF_LOG_INFO(
-                    "Error: Command failed to be parsed on the Notification Provider. ");
+            NRF_LOG_WARNING("ANCS error: Command failed to be parsed on the "
+                            "Notification Provider");
             break;
 
         case BLE_ANCS_NP_INVALID_PARAMETER:
-            NRF_LOG_INFO(
-                    "Error: Parameter does not refer to an existing object on the Notification Provider. ");
+            NRF_LOG_WARNING("ANCS error: Parameter does not refer to an "
+                            "existing object on the Notification Provider");
             break;
 
         case BLE_ANCS_NP_ACTION_FAILED:
-            NRF_LOG_INFO(
-                    "Error: Perform Notification Action Failed on the Notification Provider. ");
+            NRF_LOG_WARNING("Error: Perform Notification Action Failed on the "
+                            "Notification Provider");
             break;
 
         default:
