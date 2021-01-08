@@ -12,7 +12,6 @@
 #include "phase_gatt.h"
 
 
-#define SEC_PARAM_TIMEOUT           30                      /**< Time-out for pairing request or security request (in seconds). */
 #define SEC_PARAM_BOND              1                       /**< Perform bonding. */
 #define SEC_PARAM_MITM              0                       /**< Man In The Middle protection requirement. */
 #define SEC_PARAM_LESC              0                       /**< LE Secure Connections not enabled. */
@@ -37,7 +36,7 @@ uint32_t whitelist_len;
  */
 static void pm_evt_handler(pm_evt_t const *p_evt) {
 
-    ret_code_t err_code;
+    ret_code_t err;
 
     pm_handler_on_pm_evt(p_evt);
     pm_handler_flash_clean(p_evt);
@@ -47,9 +46,9 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
             cur_peer = p_evt->peer_id;
 
             // Discover peer's services.
-            err_code = ble_db_discovery_start(get_discovery_db(),
-                                              p_evt->conn_handle);
-            APP_ERROR_CHECK(err_code);
+            err = ble_db_discovery_start(get_discovery_db(),
+                                         p_evt->conn_handle);
+            APP_ERROR_CHECK(err);
             break;
 
         case PM_EVT_PEERS_DELETE_SUCCEEDED:
@@ -74,15 +73,14 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                     whitelist[whitelist_len++] = cur_peer;
 
                     // Update the whitelist in the Peer Manager.
-                    err_code = pm_device_identities_list_set(whitelist,
-                                                             whitelist_len);
-                    if (err_code != NRF_ERROR_NOT_SUPPORTED) {
-                        APP_ERROR_CHECK(err_code);
+                    err = pm_device_identities_list_set(whitelist,
+                                                        whitelist_len);
+                    if (err != NRF_ERROR_NOT_SUPPORTED) {
+                        APP_ERROR_CHECK(err);
                     }
 
-                    err_code = pm_whitelist_set(whitelist,
-                                                whitelist_len);
-                    APP_ERROR_CHECK(err_code);
+                    err = pm_whitelist_set(whitelist, whitelist_len);
+                    APP_ERROR_CHECK(err);
 
                 }
 
@@ -100,11 +98,11 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
  */
 void peer_manager_init(void) {
 
-    ret_code_t err_code;
+    ret_code_t err;
     ble_gap_sec_params_t sec_param;
 
-    err_code = pm_init();
-    APP_ERROR_CHECK(err_code);
+    err = pm_init();
+    APP_ERROR_CHECK(err);
 
     memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
 
@@ -122,11 +120,11 @@ void peer_manager_init(void) {
     sec_param.kdist_peer.enc = 1;
     sec_param.kdist_peer.id = 1;
 
-    err_code = pm_sec_params_set(&sec_param);
-    APP_ERROR_CHECK(err_code);
+    err = pm_sec_params_set(&sec_param);
+    APP_ERROR_CHECK(err);
 
-    err_code = pm_register(pm_evt_handler);
-    APP_ERROR_CHECK(err_code);
+    err = pm_register(pm_evt_handler);
+    APP_ERROR_CHECK(err);
 
 }
 

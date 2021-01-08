@@ -19,10 +19,10 @@ void bluetooth_init(void) {
     gap_params_init();
     gatt_init();
     db_discovery_init();
-    advertising_init();
-    peer_manager_init();
     cts_init();
+    advertising_init();
     conn_params_init();
+    peer_manager_init();
 }
 
 

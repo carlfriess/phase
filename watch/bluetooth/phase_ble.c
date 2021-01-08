@@ -126,21 +126,21 @@ static void nrf_qwr_error_handler(uint32_t nrf_error) {
  */
 void ble_stack_init(void) {
 
-    ret_code_t err_code;
+    ret_code_t err;
     nrf_ble_qwr_init_t qwr_init = {0};
 
-    err_code = nrf_sdh_enable_request();
-    APP_ERROR_CHECK(err_code);
+    err = nrf_sdh_enable_request();
+    APP_ERROR_CHECK(err);
 
     // Configure the BLE stack using the default settings.
     // Fetch the start address of the application RAM.
     uint32_t ram_start = 0;
-    err_code = nrf_sdh_ble_default_cfg_set(APP_BLE_CONN_CFG_TAG, &ram_start);
-    APP_ERROR_CHECK(err_code);
+    err = nrf_sdh_ble_default_cfg_set(APP_BLE_CONN_CFG_TAG, &ram_start);
+    APP_ERROR_CHECK(err);
 
     // Enable BLE stack.
-    err_code = nrf_sdh_ble_enable(&ram_start);
-    APP_ERROR_CHECK(err_code);
+    err = nrf_sdh_ble_enable(&ram_start);
+    APP_ERROR_CHECK(err);
 
     // Register a handler for BLE events.
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler,
@@ -148,8 +148,8 @@ void ble_stack_init(void) {
 
     // Initialize Queued Write Module
     qwr_init.error_handler = nrf_qwr_error_handler;
-    err_code = nrf_ble_qwr_init(&ble_qwr, &qwr_init);
-    APP_ERROR_CHECK(err_code);
+    err = nrf_ble_qwr_init(&ble_qwr, &qwr_init);
+    APP_ERROR_CHECK(err);
 
 }
 
@@ -161,7 +161,7 @@ void ble_stack_init(void) {
  *
  * @param[in] ble_adv_evt  Advertising event.
  */
-static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
+static void adv_evt_handler(ble_adv_evt_t ble_adv_evt) {
 
     ret_code_t err_code;
 
@@ -247,7 +247,7 @@ void advertising_init(void) {
     init.config.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
     init.config.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
 
-    init.evt_handler = on_adv_evt;
+    init.evt_handler = adv_evt_handler;
 
     err_code = ble_advertising_init(&m_advertising, &init);
     APP_ERROR_CHECK(err_code);

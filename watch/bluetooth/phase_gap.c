@@ -32,19 +32,18 @@
  */
 void gap_params_init(void) {
 
-    ret_code_t err_code;
+    ret_code_t err;
     ble_gap_conn_params_t gap_conn_params;
     ble_gap_conn_sec_mode_t sec_mode;
 
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
 
-    err_code = sd_ble_gap_device_name_set(&sec_mode,
-                                          (const uint8_t *) DEVICE_NAME,
-                                          sizeof(DEVICE_NAME));
-    APP_ERROR_CHECK(err_code);
+    err = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *) DEVICE_NAME,
+                                     sizeof(DEVICE_NAME));
+    APP_ERROR_CHECK(err);
 
-    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_WATCH);
-    APP_ERROR_CHECK(err_code);
+    err = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_WATCH);
+    APP_ERROR_CHECK(err);
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
@@ -53,8 +52,8 @@ void gap_params_init(void) {
     gap_conn_params.slave_latency = SLAVE_LATENCY;
     gap_conn_params.conn_sup_timeout = CONN_SUP_TIMEOUT;
 
-    err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
-    APP_ERROR_CHECK(err_code);
+    err = sd_ble_gap_ppcp_set(&gap_conn_params);
+    APP_ERROR_CHECK(err);
 
 }
 
@@ -79,7 +78,7 @@ static void conn_params_error_handler(uint32_t nrf_error) {
  */
 void conn_params_init(void) {
 
-    ret_code_t err_code;
+    ret_code_t err;
     ble_conn_params_init_t cp_init;
 
     memset(&cp_init, 0, sizeof(cp_init));
@@ -93,7 +92,7 @@ void conn_params_init(void) {
     cp_init.evt_handler = conn_params_evt_handler;
     cp_init.error_handler = conn_params_error_handler;
 
-    err_code = ble_conn_params_init(&cp_init);
-    APP_ERROR_CHECK(err_code);
+    err = ble_conn_params_init(&cp_init);
+    APP_ERROR_CHECK(err);
 
 }

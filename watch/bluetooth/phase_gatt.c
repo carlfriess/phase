@@ -61,6 +61,7 @@ static void db_disc_handler(ble_db_discovery_evt_t *p_evt) {
  */
 void db_discovery_init(void) {
 
+    ret_code_t err;
     ble_db_discovery_init_t db_init;
 
     memset(&db_init, 0, sizeof(ble_db_discovery_init_t));
@@ -68,7 +69,7 @@ void db_discovery_init(void) {
     db_init.evt_handler = db_disc_handler;
     db_init.p_gatt_queue = &gatt_queue;
 
-    ret_code_t err_code = ble_db_discovery_init(&db_init);
-    APP_ERROR_CHECK(err_code);
+    err = ble_db_discovery_init(&db_init);
+    APP_ERROR_CHECK(err);
 
 }
