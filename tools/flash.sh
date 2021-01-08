@@ -26,4 +26,4 @@ if [ ! -f "$NRFJPROG" ]; then
     exit 1
 fi
 
-$NRFJPROG --program $1 --sectorerase --reset
+$NRFJPROG --program $1 --chiperase --reset
