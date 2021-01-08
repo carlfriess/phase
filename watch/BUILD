@@ -101,6 +101,7 @@ nRF5_binary(
     linker_cmd = "config/ble_app_ancs_c_gcc_nrf52.ld",
     linkopts = [
         "-lstdc++",
+        "-Wl,-Map=output.map",
     ],
     sdk_config_prefix = "config",
     deps = [
