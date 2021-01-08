@@ -99,6 +99,45 @@ TEST(View, Children) {
 
 }
 
+TEST(View, RemoveChild) {
+
+    uint8_t buf[sizeof(phase::ui::Color)];
+    phase::ui::View root({{0, 0}, 1, 1});
+
+    phase::ui::View child1(root.getFrame());
+    child1.setBackgroundColor(phase::ui::red);
+    root.addChildView(&child1);
+
+    phase::ui::View child2(root.getFrame());
+    child2.setBackgroundColor(phase::ui::green);
+    root.addChildView(&child2);
+
+    phase::ui::View child3(root.getFrame());
+    child3.setBackgroundColor(phase::ui::blue);
+    child3.setVisible(false);
+    root.addChildView(&child3);
+
+    root.render(buf, root.getFrame());
+    for (size_t i = 0; i < sizeof(phase::ui::Color); ++i) {
+        EXPECT_EQ(buf[i], phase::ui::green[i]);
+    }
+
+    root.removeChildView(&child2);
+
+    root.render(buf, root.getFrame());
+    for (size_t i = 0; i < sizeof(phase::ui::Color); ++i) {
+        EXPECT_EQ(buf[i], phase::ui::red[i]);
+    }
+
+    child3.setVisible(true);
+
+    root.render(buf, root.getFrame());
+    for (size_t i = 0; i < sizeof(phase::ui::Color); ++i) {
+        EXPECT_EQ(buf[i], phase::ui::blue[i]);
+    }
+
+}
+
 TEST(View, DirtyView) {
 
     phase::ui::View view({{0, 0}, 1, 1});

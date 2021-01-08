@@ -98,6 +98,8 @@ public:
 
     void addChildView(View *view);
 
+    void removeChildView(View *view);
+
     bool isDirty() const;
 
     Frame getDirtyFrame() const;

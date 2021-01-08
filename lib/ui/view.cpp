@@ -60,6 +60,12 @@ void View::addChildView(View *view) {
     subviews.push_back(view);
 }
 
+void View::removeChildView(View *view) {
+    dirty = !!std::count(subviews.begin(), subviews.end(), view);
+    subviews.erase(std::remove(subviews.begin(), subviews.end(), view),
+                   subviews.end());
+}
+
 bool View::isDirty() const {
 
     // Check if this view is dirty
