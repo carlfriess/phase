@@ -4,12 +4,16 @@
 
 #include "phase_peer_manager.h"
 
+#include <stdbool.h>
+
 #include "ble_db_discovery.h"
+#include "nrf_ble_gatts_c.h"
 #include "nrf_log.h"
 #include "peer_manager_handler.h"
 
 #include "phase_ble.h"
 #include "phase_gatt.h"
+#include "phase_gatts.h"
 
 
 #define SEC_PARAM_BOND              1                       /**< Perform bonding. */
@@ -21,9 +25,6 @@
 #define SEC_PARAM_MIN_KEY_SIZE      7                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE      16                      /**< Maximum encryption key size. */
 
-
-// Device reference handle to the current bonded central
-static pm_peer_id_t cur_peer;
 
 // List of whitelisted peers
 pm_peer_id_t whitelist[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
@@ -43,11 +44,14 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
 
     switch (p_evt->evt_id) {
         case PM_EVT_CONN_SEC_SUCCEEDED:
-            cur_peer = p_evt->peer_id;
+            err = nrf_ble_gatts_c_handles_assign(get_gatts_c(),
+                                                 p_evt->conn_handle, NULL);
+            APP_ERROR_CHECK(err);
 
-            // Discover peer's services.
-            err = ble_db_discovery_start(get_discovery_db(),
-                                         p_evt->conn_handle);
+            // Discover peer's services
+            ble_db_discovery_t *discovery_db = get_discovery_db();
+            memset(discovery_db, 0, sizeof(ble_db_discovery_t));
+            err = ble_db_discovery_start(discovery_db, p_evt->conn_handle);
             APP_ERROR_CHECK(err);
             break;
 
@@ -70,7 +74,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                 if (whitelist_len < BLE_GAP_WHITELIST_ADDR_MAX_COUNT) {
 
                     // Bonded to a new peer, add it to the whitelist.
-                    whitelist[whitelist_len++] = cur_peer;
+                    whitelist[whitelist_len++] = p_evt->peer_id;
 
                     // Update the whitelist in the Peer Manager.
                     err = pm_device_identities_list_set(whitelist,

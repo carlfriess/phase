@@ -7,9 +7,13 @@
 #include "app_error.h"
 #include "ble_cts_c.h"
 #include "ble_db_discovery.h"
+#include "nrf_ble_ancs_c.h"
 #include "nrf_ble_gatt.h"
+#include "nrf_ble_gatts_c.h"
 
+#include "phase_ancs.h"
 #include "phase_cts.h"
+#include "phase_gatts.h"
 
 
 // GATT module instance
@@ -53,6 +57,8 @@ void gatt_init(void) {
  */
 static void db_disc_handler(ble_db_discovery_evt_t *p_evt) {
     ble_cts_c_on_db_disc_evt(get_cts(), p_evt);
+    ble_ancs_c_on_db_disc_evt(get_ancs(), p_evt);
+    nrf_ble_gatts_c_on_db_disc_evt(get_gatts_c(), p_evt);
 }
 
 

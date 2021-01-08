@@ -15,12 +15,16 @@ nRF5_binary(
             "**/*.cpp",
             "**/*.h",
         ],
-        exclude = ["config/*"]
+        exclude = ["config/*"],
     ) + [
         ":background",
         "@nRF5//:components/ble/ble_advertising/ble_advertising.c",
         "@nRF5//:components/ble/ble_db_discovery/ble_db_discovery.c",
+        "@nRF5//:components/ble/ble_services/ble_ancs_c/ancs_app_attr_get.c",
+        "@nRF5//:components/ble/ble_services/ble_ancs_c/ancs_attr_parser.c",
+        "@nRF5//:components/ble/ble_services/ble_ancs_c/nrf_ble_ancs_c.c",
         "@nRF5//:components/ble/ble_services/ble_cts_c/ble_cts_c.c",
+        "@nRF5//:components/ble/ble_services/experimental_gatts_c/nrf_ble_gatts_c.c",
         "@nRF5//:components/ble/common/ble_advdata.c",
         "@nRF5//:components/ble/common/ble_conn_params.c",
         "@nRF5//:components/ble/common/ble_conn_state.c",

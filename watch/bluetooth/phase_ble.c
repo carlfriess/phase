@@ -14,6 +14,7 @@
 #include "nrf_sdh_ble.h"
 #include "peer_manager_handler.h"
 
+#include "phase_ancs.h"
 #include "phase_cts.h"
 #include "phase_peer_manager.h"
 
@@ -37,9 +38,7 @@ BLE_ADVERTISING_DEF(m_advertising);
 NRF_BLE_QWR_DEF(ble_qwr);
 
 // Solicited UUIDs for advertising
-static ble_uuid_t m_adv_solicited_uuids[] = {
-        {BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE},
-};
+static ble_uuid_t adv_solicited_uuids[1];
 
 
 /**@brief Function for handling BLE events.
@@ -66,6 +65,9 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
             cur_conn = BLE_CONN_HANDLE_INVALID;
             if (p_ble_evt->evt.gap_evt.conn_handle == get_cts()->conn_handle) {
                 get_cts()->conn_handle = BLE_CONN_HANDLE_INVALID;
+            }
+            if (p_ble_evt->evt.gap_evt.conn_handle == get_ancs()->conn_handle) {
+                get_ancs()->conn_handle = BLE_CONN_HANDLE_INVALID;
             }
             break;
 
@@ -143,7 +145,7 @@ void ble_stack_init(void) {
     APP_ERROR_CHECK(err);
 
     // Register a handler for BLE events.
-    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler,
+    NRF_SDH_BLE_OBSERVER(ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler,
                          NULL);
 
     // Initialize Queued Write Module
@@ -230,14 +232,17 @@ void advertising_init(void) {
     ret_code_t err_code;
     ble_advertising_init_t init;
 
+    // Add ANCS UUID to solicited UUIDs
+    adv_solicited_uuids[0] = get_ancs()->service.service.uuid;
+
     memset(&init, 0, sizeof(init));
 
     init.advdata.name_type = BLE_ADVDATA_FULL_NAME;
     init.advdata.include_appearance = true;
     init.advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
     init.advdata.uuids_solicited.uuid_cnt =
-            sizeof(m_adv_solicited_uuids) / sizeof(m_adv_solicited_uuids[0]);
-    init.advdata.uuids_solicited.p_uuids = m_adv_solicited_uuids;
+            sizeof(adv_solicited_uuids) / sizeof(adv_solicited_uuids[0]);
+    init.advdata.uuids_solicited.p_uuids = adv_solicited_uuids;
 
     init.config.ble_adv_whitelist_enabled = true;
     init.config.ble_adv_fast_enabled = true;

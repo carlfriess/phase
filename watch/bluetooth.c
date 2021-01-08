@@ -6,9 +6,11 @@
 
 #include "app_error.h"
 
+#include "bluetooth/phase_ancs.h"
 #include "bluetooth/phase_ble.h"
 #include "bluetooth/phase_gap.h"
 #include "bluetooth/phase_gatt.h"
+#include "bluetooth/phase_gatts.h"
 #include "bluetooth/phase_peer_manager.h"
 #include "bluetooth/phase_cts.h"
 
@@ -20,6 +22,8 @@ void bluetooth_init(void) {
     gatt_init();
     db_discovery_init();
     cts_init();
+    gatts_c_init();
+    ancs_init();
     advertising_init();
     conn_params_init();
     peer_manager_init();

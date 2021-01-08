@@ -386,7 +386,7 @@
 
 // <o> NRF_BLE_GQ_GATTC_WRITE_MAX_DATA_LEN - Maximal size of the data inside GATTC write request (in bytes). 
 #ifndef NRF_BLE_GQ_GATTC_WRITE_MAX_DATA_LEN
-#define NRF_BLE_GQ_GATTC_WRITE_MAX_DATA_LEN 16
+#define NRF_BLE_GQ_GATTC_WRITE_MAX_DATA_LEN 20
 #endif
 
 // <o> NRF_BLE_GQ_GATTS_HVX_MAX_DATA_LEN - Maximal size of the data inside GATTC notification or indication request (in bytes). 
@@ -450,7 +450,7 @@
 // <i> Set this to false to save code space if not using the peer rank API.
 
 #ifndef PM_PEER_RANKS_ENABLED
-#define PM_PEER_RANKS_ENABLED 1
+#define PM_PEER_RANKS_ENABLED 0
 #endif
 
 // <q> PM_LESC_ENABLED  - Enable/disable LESC support in Peer Manager.
@@ -495,7 +495,7 @@
 // <i>  This might be necessary for interoperability reasons, especially as peripheral.
 
 #ifndef PM_HANDLER_SEC_DELAY_MS
-#define PM_HANDLER_SEC_DELAY_MS 4000
+#define PM_HANDLER_SEC_DELAY_MS 0
 #endif
 
 // </e>
@@ -510,7 +510,7 @@
 
 
 #ifndef BLE_ANCS_C_ENABLED
-#define BLE_ANCS_C_ENABLED 0
+#define BLE_ANCS_C_ENABLED 1
 #endif
 
 // <q> BLE_ANS_C_ENABLED  - ble_ans_c - Alert Notification Service Client
@@ -811,6 +811,12 @@
 
 #ifndef BLE_TPS_ENABLED
 #define BLE_TPS_ENABLED 0
+#endif
+
+// <q> NRF_BLE_GATTS_C_ENABLED  - nrf_ble_gatts_c - GATT Service Client
+
+#ifndef NRF_BLE_GATTS_C_ENABLED
+#define NRF_BLE_GATTS_C_ENABLED 1
 #endif
 
 // </h> 
@@ -10022,7 +10028,7 @@
 
 // <o> NRF_SDH_BLE_VS_UUID_COUNT - The number of vendor-specific UUIDs. 
 #ifndef NRF_SDH_BLE_VS_UUID_COUNT
-#define NRF_SDH_BLE_VS_UUID_COUNT 0
+#define NRF_SDH_BLE_VS_UUID_COUNT 10
 #endif
 
 // <q> NRF_SDH_BLE_SERVICE_CHANGED  - Include the Service Changed characteristic in the Attribute Table.
@@ -10468,7 +10474,7 @@
 // <2=> NRF_SDH_DISPATCH_MODEL_POLLING 
 
 #ifndef NRF_SDH_DISPATCH_MODEL
-#define NRF_SDH_DISPATCH_MODEL 0
+#define NRF_SDH_DISPATCH_MODEL 1
 #endif
 
 // </h> 
