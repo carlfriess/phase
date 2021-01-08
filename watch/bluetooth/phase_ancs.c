@@ -10,24 +10,12 @@
 #include "phase_gatt.h"
 
 
-#define ATTR_DATA_SIZE                 BLE_ANCS_ATTR_DATA_MAX                 /**< Allocated size for attribute data. */
-
-
-static ble_ancs_c_evt_notif_t m_notification_latest;                          /**< Local copy to keep track of the newest arriving notifications. */
-static ble_ancs_c_attr_t m_notif_attr_latest;                            /**< Local copy of the newest notification attribute. */
-static ble_ancs_c_attr_t m_notif_attr_app_id_latest;                     /**< Local copy of the newest app attribute. */
-
-static uint8_t m_attr_appid[ATTR_DATA_SIZE];                                  /**< Buffer to store attribute data. */
-static uint8_t m_attr_title[ATTR_DATA_SIZE];                                  /**< Buffer to store attribute data. */
-static uint8_t m_attr_subtitle[ATTR_DATA_SIZE];                               /**< Buffer to store attribute data. */
-static uint8_t m_attr_message[ATTR_DATA_SIZE];                                /**< Buffer to store attribute data. */
-static uint8_t m_attr_message_size[ATTR_DATA_SIZE];                           /**< Buffer to store attribute data. */
-static uint8_t m_attr_date[ATTR_DATA_SIZE];                                   /**< Buffer to store attribute data. */
-static uint8_t m_attr_posaction[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
-static uint8_t m_attr_negaction[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
-static uint8_t m_attr_disp_name[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
-
 BLE_ANCS_C_DEF(ancs);
+
+
+static uint8_t notification_attr_appid[BLE_ANCS_ATTR_DATA_MAX];
+static uint8_t notification_attr_title[BLE_ANCS_ATTR_DATA_MAX];
+static uint8_t notification_attr_message[BLE_ANCS_ATTR_DATA_MAX];
 
 
 /**@brief Returns the ANCS Client instance.
@@ -36,31 +24,6 @@ ble_ancs_c_t *get_ancs(void) {
     return &ancs;
 }
 
-
-/**@brief String literals for the iOS notification categories. used then printing to UART. */
-static char const *lit_catid[BLE_ANCS_NB_OF_CATEGORY_ID] =
-        {
-                "Other",
-                "Incoming Call",
-                "Missed Call",
-                "Voice Mail",
-                "Social",
-                "Schedule",
-                "Email",
-                "News",
-                "Health And Fitness",
-                "Business And Finance",
-                "Location",
-                "Entertainment"
-        };
-
-/**@brief String literals for the iOS notification event types. Used then printing to UART. */
-static char const *lit_eventid[BLE_ANCS_NB_OF_EVT_ID] =
-        {
-                "Added",
-                "Modified",
-                "Removed"
-        };
 
 /**@brief String literals for the iOS notification attribute types. Used when printing to UART. */
 static char const *lit_attrid[BLE_ANCS_NB_OF_NOTIF_ATTR] =
@@ -75,42 +38,6 @@ static char const *lit_attrid[BLE_ANCS_NB_OF_NOTIF_ATTR] =
                 "Negative Action Label"
         };
 
-/**@brief String literals for the iOS notification attribute types. Used When printing to UART. */
-static char const *lit_appid[BLE_ANCS_NB_OF_APP_ATTR] =
-        {
-                "Display Name"
-        };
-
-
-/**@brief Function for printing an iOS notification.
- *
- * @param[in] p_notif  Pointer to the iOS notification.
- */
-static void notif_print(ble_ancs_c_evt_notif_t *p_notif) {
-    NRF_LOG_INFO("\r\nNotification");
-    NRF_LOG_INFO("Event:       %s", (uint32_t) lit_eventid[p_notif->evt_id]);
-    NRF_LOG_INFO("Category ID: %s", (uint32_t) lit_catid[p_notif->category_id]);
-    NRF_LOG_INFO("Category Cnt:%u", (unsigned int) p_notif->category_count);
-    NRF_LOG_INFO("UID:         %u", (unsigned int) p_notif->notif_uid);
-
-    NRF_LOG_INFO("Flags:");
-    if (p_notif->evt_flags.silent == 1) {
-        NRF_LOG_INFO(" Silent");
-    }
-    if (p_notif->evt_flags.important == 1) {
-        NRF_LOG_INFO(" Important");
-    }
-    if (p_notif->evt_flags.pre_existing == 1) {
-        NRF_LOG_INFO(" Pre-existing");
-    }
-    if (p_notif->evt_flags.positive_action == 1) {
-        NRF_LOG_INFO(" Positive Action");
-    }
-    if (p_notif->evt_flags.negative_action == 1) {
-        NRF_LOG_INFO(" Negative Action");
-    }
-}
-
 
 /**@brief Function for printing iOS notification attribute data.
  *
@@ -122,20 +49,6 @@ static void notif_attr_print(ble_ancs_c_attr_t *p_attr) {
                      nrf_log_push((char *) p_attr->p_attr_data));
     } else if (p_attr->attr_len == 0) {
         NRF_LOG_INFO("%s: (N/A)", (uint32_t) lit_attrid[p_attr->attr_id]);
-    }
-}
-
-
-/**@brief Function for printing iOS notification attribute data.
- *
- * @param[in] p_attr Pointer to an iOS App attribute.
- */
-static void app_attr_print(ble_ancs_c_attr_t *p_attr) {
-    if (p_attr->attr_len != 0) {
-        NRF_LOG_INFO("%s: %s", (uint32_t) lit_appid[p_attr->attr_id],
-                     (uint32_t) p_attr->p_attr_data);
-    } else if (p_attr->attr_len == 0) {
-        NRF_LOG_INFO("%s: (N/A)", (uint32_t) lit_appid[p_attr->attr_id]);
     }
 }
 
@@ -177,16 +90,16 @@ static void err_code_print(uint16_t err_code_np) {
  * @details This function is called for all events in the Apple Notification client that
  *          are passed to the application.
  *
- * @param[in] p_evt  Event received from the Apple Notification Service client.
+ * @param[in] evt  Event received from the Apple Notification Service client.
  */
-static void ancs_c_evt_handler(ble_ancs_c_evt_t *p_evt) {
+static void ancs_c_evt_handler(ble_ancs_c_evt_t *evt) {
 
     ret_code_t ret;
 
-    switch (p_evt->evt_type) {
+    switch (evt->evt_type) {
         case BLE_ANCS_C_EVT_DISCOVERY_COMPLETE:
-            ret = nrf_ble_ancs_c_handles_assign(&ancs, p_evt->conn_handle,
-                                                &p_evt->service);
+            ret = nrf_ble_ancs_c_handles_assign(&ancs, evt->conn_handle,
+                                                &evt->service);
             APP_ERROR_CHECK(ret);
 
             // Delay because we cannot add a CCCD too close to starting
@@ -201,28 +114,31 @@ static void ancs_c_evt_handler(ble_ancs_c_evt_t *p_evt) {
             break;
 
         case BLE_ANCS_C_EVT_NOTIF:
-            m_notification_latest = p_evt->notif;
-            notif_print(&m_notification_latest);
+            // Check if we want to display this notification
+            if (evt->notif.evt_id == BLE_ANCS_EVENT_ID_NOTIFICATION_ADDED &&
+                !evt->notif.evt_flags.pre_existing &&
+                !evt->notif.evt_flags.silent) {
+                // Request the notification attributes
+                nrf_ble_ancs_c_request_attrs(&ancs, &evt->notif);
+            }
             break;
 
         case BLE_ANCS_C_EVT_NOTIF_ATTRIBUTE:
-            m_notif_attr_latest = p_evt->attr;
-            notif_attr_print(&m_notif_attr_latest);
-            if (p_evt->attr.attr_id == BLE_ANCS_NOTIF_ATTR_ID_APP_IDENTIFIER) {
-                m_notif_attr_app_id_latest = p_evt->attr;
-            }
+            notif_attr_print(&evt->attr);
             break;
+
+        case BLE_ANCS_C_EVT_APP_ATTRIBUTE:
+            break;
+
         case BLE_ANCS_C_EVT_DISCOVERY_FAILED:
             NRF_LOG_DEBUG("Apple Notification Center Service not discovered on "
                           "the server.");
             break;
 
-        case BLE_ANCS_C_EVT_APP_ATTRIBUTE:
-            app_attr_print(&p_evt->attr);
-            break;
         case BLE_ANCS_C_EVT_NP_ERROR:
-            err_code_print(p_evt->err_code_np);
+            err_code_print(evt->err_code_np);
             break;
+
         default:
             // No implementation needed.
             break;
@@ -250,58 +166,19 @@ void ancs_init(void) {
     // Init the Apple Notification Center Service client module.
     memset(&ancs_c_init, 0, sizeof(ancs_c_init));
 
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_APP_IDENTIFIER,
-                                  m_attr_appid,
-                                  ATTR_DATA_SIZE);
+    err = nrf_ble_ancs_c_attr_add(&ancs, BLE_ANCS_NOTIF_ATTR_ID_APP_IDENTIFIER,
+                                  notification_attr_appid,
+                                  sizeof(notification_attr_appid));
     APP_ERROR_CHECK(err);
 
-    err = nrf_ble_ancs_c_app_attr_add(&ancs,
-                                      BLE_ANCS_APP_ATTR_ID_DISPLAY_NAME,
-                                      m_attr_disp_name,
-                                      sizeof(m_attr_disp_name));
+    err = nrf_ble_ancs_c_attr_add(&ancs, BLE_ANCS_NOTIF_ATTR_ID_TITLE,
+                                  notification_attr_title,
+                                  sizeof(notification_attr_title));
     APP_ERROR_CHECK(err);
 
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_TITLE,
-                                  m_attr_title,
-                                  ATTR_DATA_SIZE);
-    APP_ERROR_CHECK(err);
-
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_MESSAGE,
-                                  m_attr_message,
-                                  ATTR_DATA_SIZE);
-    APP_ERROR_CHECK(err);
-
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_SUBTITLE,
-                                  m_attr_subtitle,
-                                  ATTR_DATA_SIZE);
-    APP_ERROR_CHECK(err);
-
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_MESSAGE_SIZE,
-                                  m_attr_message_size,
-                                  ATTR_DATA_SIZE);
-    APP_ERROR_CHECK(err);
-
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_DATE,
-                                  m_attr_date,
-                                  ATTR_DATA_SIZE);
-    APP_ERROR_CHECK(err);
-
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_POSITIVE_ACTION_LABEL,
-                                  m_attr_posaction,
-                                  ATTR_DATA_SIZE);
-    APP_ERROR_CHECK(err);
-
-    err = nrf_ble_ancs_c_attr_add(&ancs,
-                                  BLE_ANCS_NOTIF_ATTR_ID_NEGATIVE_ACTION_LABEL,
-                                  m_attr_negaction,
-                                  ATTR_DATA_SIZE);
+    err = nrf_ble_ancs_c_attr_add(&ancs, BLE_ANCS_NOTIF_ATTR_ID_MESSAGE,
+                                  notification_attr_message,
+                                  sizeof(notification_attr_message));
     APP_ERROR_CHECK(err);
 
     ancs_c_init.evt_handler = ancs_c_evt_handler;
