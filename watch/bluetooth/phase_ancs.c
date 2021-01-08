@@ -7,49 +7,22 @@
 #include "nrf_delay.h"
 #include "nrf_log.h"
 
+#include "phase_bluetooth_handlers.h"
 #include "phase_gatt.h"
 
 
 BLE_ANCS_C_DEF(ancs);
 
 
-static uint8_t notification_attr_appid[BLE_ANCS_ATTR_DATA_MAX];
-static uint8_t notification_attr_title[BLE_ANCS_ATTR_DATA_MAX];
-static uint8_t notification_attr_message[BLE_ANCS_ATTR_DATA_MAX];
+static uint8_t notif_attr_appid[BLE_ANCS_ATTR_DATA_MAX];
+static uint8_t notif_attr_title[BLE_ANCS_ATTR_DATA_MAX];
+static uint8_t notif_attr_message[BLE_ANCS_ATTR_DATA_MAX];
 
 
 /**@brief Returns the ANCS Client instance.
  */
 ble_ancs_c_t *get_ancs(void) {
     return &ancs;
-}
-
-
-/**@brief String literals for the iOS notification attribute types. Used when printing to UART. */
-static char const *lit_attrid[BLE_ANCS_NB_OF_NOTIF_ATTR] =
-        {
-                "App Identifier",
-                "Title",
-                "Subtitle",
-                "Message",
-                "Message Size",
-                "Date",
-                "Positive Action Label",
-                "Negative Action Label"
-        };
-
-
-/**@brief Function for printing iOS notification attribute data.
- *
- * @param[in] p_attr Pointer to an iOS notification attribute.
- */
-static void notif_attr_print(ble_ancs_c_attr_t *p_attr) {
-    if (p_attr->attr_len != 0) {
-        NRF_LOG_INFO("%s: %s", (uint32_t) lit_attrid[p_attr->attr_id],
-                     nrf_log_push((char *) p_attr->p_attr_data));
-    } else if (p_attr->attr_len == 0) {
-        NRF_LOG_INFO("%s: (N/A)", (uint32_t) lit_attrid[p_attr->attr_id]);
-    }
 }
 
 
@@ -125,7 +98,11 @@ static void ancs_c_evt_handler(ble_ancs_c_evt_t *evt) {
             break;
 
         case BLE_ANCS_C_EVT_NOTIF_ATTRIBUTE:
-            notif_attr_print(&evt->attr);
+            if (evt->attr.attr_id == BLE_ANCS_NOTIF_ATTR_ID_MESSAGE) {
+                bluetooth_notification_add((char *) notif_attr_appid,
+                                           (char *) notif_attr_title,
+                                           (char *) notif_attr_message);
+            }
             break;
 
         case BLE_ANCS_C_EVT_APP_ATTRIBUTE:
@@ -168,18 +145,16 @@ void ancs_init(void) {
     memset(&ancs_c_init, 0, sizeof(ancs_c_init));
 
     err = nrf_ble_ancs_c_attr_add(&ancs, BLE_ANCS_NOTIF_ATTR_ID_APP_IDENTIFIER,
-                                  notification_attr_appid,
-                                  sizeof(notification_attr_appid));
+                                  notif_attr_appid, sizeof(notif_attr_appid));
     APP_ERROR_CHECK(err);
 
     err = nrf_ble_ancs_c_attr_add(&ancs, BLE_ANCS_NOTIF_ATTR_ID_TITLE,
-                                  notification_attr_title,
-                                  sizeof(notification_attr_title));
+                                  notif_attr_title, sizeof(notif_attr_title));
     APP_ERROR_CHECK(err);
 
     err = nrf_ble_ancs_c_attr_add(&ancs, BLE_ANCS_NOTIF_ATTR_ID_MESSAGE,
-                                  notification_attr_message,
-                                  sizeof(notification_attr_message));
+                                  notif_attr_message,
+                                  sizeof(notif_attr_message));
     APP_ERROR_CHECK(err);
 
     ancs_c_init.evt_handler = ancs_c_evt_handler;

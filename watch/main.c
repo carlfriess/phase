@@ -54,6 +54,9 @@ void bluetooth_time_handler(time_t time) {
     ui_set_datetime(time);
 }
 
+void bluetooth_notification_add(char *appid, char *title, char *msg) {
+}
+
 static void time_sync_handler(void *ctx) {
     bluetooth_request_time();
 }
