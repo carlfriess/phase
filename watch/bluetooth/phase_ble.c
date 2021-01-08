@@ -61,7 +61,8 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            NRF_LOG_INFO("Disconnected.");
+            NRF_LOG_INFO("Disconnected: %d",
+                         p_ble_evt->evt.gap_evt.params.disconnected.reason);
             cur_conn = BLE_CONN_HANDLE_INVALID;
             if (p_ble_evt->evt.gap_evt.conn_handle == get_cts()->conn_handle) {
                 get_cts()->conn_handle = BLE_CONN_HANDLE_INVALID;
