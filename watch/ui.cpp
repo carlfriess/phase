@@ -6,6 +6,7 @@
 
 #include <cstdio>
 
+#include "app_timer.h"
 #include "nrf_log.h"
 
 #include "GC9A01.h"
@@ -14,6 +15,8 @@
 #include "phase-ui-watch.h"
 #include "font-quicksand-64.h"
 #include "font-opensans-12.h"
+#include "font-opensans-bold-12.h"
+#include "icons.h"
 
 #define NRF_LOG_UI_FRAME(frame) NRF_LOG_DEBUG("(%d, %d) %d %d", frame.origin.x, frame.origin.y, frame.width, frame.height)
 
@@ -33,12 +36,23 @@ static inline void swap_bufs() {
     bufs[0] = tmp;
 }
 
+APP_TIMER_DEF(notification_timer);
+
 phase::ui::View root(phase::ui::watch::display_frame);
 
 phase::ui::TextView *time_view;
 phase::ui::TextView *date_view;
 
+phase::ui::watch::NotificationView *notification_view = nullptr;
+
+static void notification_timer_handler(void *ctx) {
+    ui_remove_notification();
+}
+
 void ui_init(void) {
+
+    app_timer_create(&notification_timer, APP_TIMER_MODE_SINGLE_SHOT,
+                     notification_timer_handler);
 
     root.setOpaque(false);
 
@@ -171,4 +185,43 @@ void ui_set_date(const char *weekday, uint8_t day, const char *month) {
     snprintf(str, sizeof(str), "%s, %d %s", weekday, day, month);
     date_view->setVisible(true);
     date_view->setText(str);
+}
+
+void ui_add_notification(char *appid, char *title, char *msg) {
+
+    const uint8_t *icon = nullptr;
+    phase::ui::Frame frame = {{0, 110}, 240, 130};
+
+    // Remove any existing notification
+    ui_remove_notification();
+
+    // Try to find the icon for the given app
+    auto it = icons.find(appid);
+    if (it != icons.end()) {
+        icon = it->second;
+        frame.origin.y -= 60;
+        frame.height += 60;
+    }
+
+    // Create a new NotificationView and add it to the root view
+    notification_view = new phase::ui::watch::NotificationView(
+            title,
+            &font_opensans_bold_12,
+            msg,
+            &font_opensans_12,
+            icon,
+            frame);
+    root.addChildView(notification_view);
+
+    // Start the timer to remove the notification automatically after 10 sec
+    app_timer_start(notification_timer, APP_TIMER_TICKS(10000), nullptr);
+
+}
+
+void ui_remove_notification() {
+    app_timer_stop(notification_timer);
+    if (notification_view) {
+        root.removeChildView(notification_view);
+        delete notification_view;
+    }
 }

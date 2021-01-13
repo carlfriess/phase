@@ -113,7 +113,9 @@ nRF5_binary(
         "//lib:ui",
         "//lib:ui-watch",
         "//lib/fonts:opensans-12",
+        "//lib/fonts:opensans-bold-12",
         "//lib/fonts:quicksand-64",
+        "//lib/icons",
     ],
 )
 
