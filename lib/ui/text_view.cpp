@@ -36,10 +36,13 @@ void TextView::render(uint8_t *buffer, Frame region) const {
 
         // Get next UTF-8 character
         glyph_t cur = utf8::next(it, text.end());
+        if (cur == '\n') {
+            continue;
+        }
 
         // Fetch the next glyph
         const struct glyph *g = font_get_glyph(font, cur);
-        if (g == nullptr) {
+        if (g == nullptr && (g = font_get_glyph(font, '?')) == nullptr) {
             continue;
         }
 
