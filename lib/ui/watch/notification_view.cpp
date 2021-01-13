@@ -24,7 +24,7 @@ NotificationView::NotificationView(const char *title,
     setOpaque(false);
 
     Frame icon_frame{};
-    ImageView *icon_view;
+    ImageView *icon_view = nullptr;
     if (icon) {
         icon_frame.width = app_icon_mask_width;
         icon_frame.height = app_icon_mask_height;
