@@ -79,7 +79,9 @@ size_t TextView::setText(const std::string str) {
 
         // Get next UTF-8 character
         glyph_t cur = utf8::next(it, str.end());
-        if (std::isspace(cur)) {
+        if (cur == '\n') {
+            break;
+        } else if (std::isspace(cur)) {
             last_ws = it;
             last_ws_width = width;
         }
