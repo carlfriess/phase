@@ -44,7 +44,7 @@ void TextView::render(uint8_t *buffer, Frame region) const {
 
         // Fetch the next glyph
         const struct glyph *g = font_get_glyph(font, cur);
-        if (g == nullptr && (g = font_get_glyph(font, '?')) == nullptr) {
+        if (g == nullptr) {
             continue;
         }
 
@@ -75,7 +75,7 @@ size_t TextView::setText(const std::string str) {
 
     Coord width = 0;
     Coord last_ws_width = 0;
-    glyph_t prev = 0;
+    utf8::uint32_t prev = 0;
 
     // Iterate string and calculate width until frame width is exceeded
     auto it = str.begin();
@@ -83,10 +83,15 @@ size_t TextView::setText(const std::string str) {
     while (it < str.end()) {
 
         // Get next UTF-8 character
-        glyph_t cur = utf8::next(it, str.end());
-        if (cur == '\n') {
+        // Using the internal function to avoid throwing an exception, since the
+        // target does not support exception handling.
+        utf8::uint32_t cur;
+        if (utf8::internal::validate_next(it, str.end(), cur) !=
+            utf8::internal::UTF8_OK) {
             break;
-        } else if (std::isspace(cur)) {
+        } else if (cur == '\n') {
+            break;
+        } else if (std::isspace(static_cast<unsigned char>(cur))) {
             last_ws = it;
             last_ws_width = width;
         }
@@ -98,7 +103,7 @@ size_t TextView::setText(const std::string str) {
 
         // Lookup the next glyph
         const struct glyph *g = font_get_glyph(font, cur);
-        if (g == nullptr && (g = font_get_glyph(font, '?')) == nullptr) {
+        if (g == nullptr) {
             continue;
         }
 

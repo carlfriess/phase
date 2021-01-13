@@ -41,8 +41,14 @@ size_t MultilineTextView::setText(const std::string str) {
         // Create view for next line
         auto view = new TextView(font, sub_frame);
         view->setOpaque(false);
-        offset += view->setText(str.substr(offset));
-        addChildView(view);
+        size_t len = view->setText(str.substr(offset));
+        if (len > 0) {
+            offset += len;
+            addChildView(view);
+        } else {
+            delete view;
+            break;
+        }
 
         // Move sub-frame
         sub_frame.origin.y += sub_frame.height;
