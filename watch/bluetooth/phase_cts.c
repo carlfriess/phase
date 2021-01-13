@@ -10,6 +10,7 @@
 
 #include "phase_bluetooth_handlers.h"
 #include "phase_gatt.h"
+#include "phase_peer_manager.h"
 
 
 // Current Time Service client instance
@@ -55,6 +56,9 @@ static void on_cts_c_evt(ble_cts_c_t *p_cts, ble_cts_c_evt_t *p_evt) {
             err_code = ble_cts_c_handles_assign(&cts, p_evt->conn_handle,
                                                 &p_evt->params.char_handles);
             APP_ERROR_CHECK(err_code);
+
+            // Register discovered service with peer manager
+            discovered_cts(p_evt->conn_handle, &p_evt->params.char_handles);
 
             // Automatically request the time from the server
             err_code = ble_cts_c_current_time_read(get_cts());

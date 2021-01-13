@@ -5,6 +5,8 @@
 #ifndef PHASE_PHASE_PEER_MANAGER_H
 #define PHASE_PHASE_PEER_MANAGER_H
 
+#include "ble_cts_c.h"
+#include "nrf_ble_ancs_c.h"
 #include "peer_manager.h"
 
 // List of whitelisted peers
@@ -22,5 +24,20 @@ void peer_manager_init(void);
  *                         Out: The number of peers copied in the buffer.
  */
 void peer_list_get(pm_peer_id_t *p_peers, uint32_t *p_size);
+
+/**@brief Handler that should be called when the CTS service has been
+ * discovered to eventually store the discovered handles in flash.
+ */
+void discovered_cts(uint16_t conn_handle, const ble_cts_c_handles_t *cts);
+
+/**@brief Handler that should be called when the GATTS service has been
+ * discovered to eventually store the discovered handles in flash.
+ */
+void discovered_gatts(uint16_t conn_handle, const ble_gatt_db_char_t *gatts);
+
+/**@brief Handler that should be called when the ANCS service has been
+ * discovered to eventually store the discovered handles in flash.
+ */
+void discovered_ancs(uint16_t conn_handle, const ble_ancs_c_service_t *ancs);
 
 #endif //PHASE_PHASE_PEER_MANAGER_H

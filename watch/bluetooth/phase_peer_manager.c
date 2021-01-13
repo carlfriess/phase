@@ -4,14 +4,18 @@
 
 #include "phase_peer_manager.h"
 
+#include <assert.h>
 #include <stdbool.h>
 
 #include "ble_db_discovery.h"
+#include "fds.h"
 #include "nrf_ble_gatts_c.h"
 #include "nrf_log.h"
 #include "peer_manager_handler.h"
 
+#include "phase_ancs.h"
 #include "phase_ble.h"
+#include "phase_cts.h"
 #include "phase_gatt.h"
 #include "phase_gatts.h"
 
@@ -25,10 +29,148 @@
 #define SEC_PARAM_MIN_KEY_SIZE      7                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE      16                      /**< Maximum encryption key size. */
 
+#define NUM_PEER_SERVICES           3
 
 // List of whitelisted peers
 pm_peer_id_t whitelist[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
 uint32_t whitelist_len;
+
+// Peer services database
+// The size of peer_services must to be a multiple of 4 bytes due to internals
+// of the flash storage library.
+static ble_gatt_db_srv_t peer_services[4] = {0};
+static ble_gatt_db_srv_t *peer_service_cts = &peer_services[0];
+static ble_gatt_db_srv_t *peer_service_gatts = &peer_services[1];
+static ble_gatt_db_srv_t *peer_service_ancs = &peer_services[2];
+
+// Number of undiscovered peer services
+static int peer_services_undiscovered = NUM_PEER_SERVICES;
+
+
+static void store_handles(uint16_t conn_handle) {
+
+    ret_code_t err;
+    pm_peer_id_t peer_id;
+
+    assert(peer_services_undiscovered == 0);
+
+    // Get the peer ID based on the connection handle
+    err = pm_peer_id_get(conn_handle, &peer_id);
+    APP_ERROR_CHECK(err);
+
+    // Attempt to store the remote database to flash
+    err = pm_peer_data_remote_db_store(peer_id, peer_services,
+                                       sizeof(peer_services), NULL);
+    if (err == NRF_ERROR_STORAGE_FULL) {
+        err = fds_gc();
+    }
+    APP_ERROR_CHECK(err);
+
+}
+
+
+/**@brief Handler that should be called when the CTS service has been
+ * discovered to eventually store the discovered handles in flash.
+ */
+void discovered_cts(uint16_t conn_handle, const ble_cts_c_handles_t *cts) {
+
+    // Write discovered handles to database
+    peer_service_cts->charateristics[0].characteristic.handle_value =
+            cts->cts_handle;
+    peer_service_cts->charateristics[0].cccd_handle = cts->cts_cccd_handle;
+
+    // Check if all services have been discovered
+    if (--peer_services_undiscovered == 0) {
+        store_handles(conn_handle);
+    }
+
+}
+
+
+/**@brief Handler that should be called when the GATTS service has been
+ * discovered to eventually store the discovered handles in flash.
+ */
+void discovered_gatts(uint16_t conn_handle, const ble_gatt_db_char_t *gatts) {
+
+    // Write discovered handle to database
+    peer_service_gatts->charateristics[0] = *gatts;
+
+    // Check if all services have been discovered
+    if (--peer_services_undiscovered == 0) {
+        store_handles(conn_handle);
+    }
+
+}
+
+
+/**@brief Handler that should be called when the ANCS service has been
+ * discovered to eventually store the discovered handles in flash.
+ */
+void discovered_ancs(uint16_t conn_handle, const ble_ancs_c_service_t *ancs) {
+
+    // Write discovered handles to database
+    peer_service_ancs->charateristics[0].characteristic =
+            ancs->control_point_char;
+    peer_service_ancs->charateristics[1].characteristic =
+            ancs->notif_source_char;
+    peer_service_ancs->charateristics[1].cccd_handle =
+            ancs->notif_source_cccd.handle;
+    peer_service_ancs->charateristics[2].characteristic =
+            ancs->data_source_char;
+    peer_service_ancs->charateristics[2].cccd_handle =
+            ancs->data_source_cccd.handle;
+
+    // Check if all services have been discovered
+    if (--peer_services_undiscovered == 0) {
+        store_handles(conn_handle);
+    }
+
+}
+
+
+static bool load_handles(pm_peer_id_t peer_id, uint16_t conn_handle) {
+
+    ret_code_t err;
+    ble_cts_c_handles_t cts_handles;
+    ble_ancs_c_service_t ancs_handles;
+
+    // Attempt to load the remote database from flash
+    uint32_t data_len = sizeof(peer_services);
+    err = pm_peer_data_remote_db_load(peer_id, peer_services, &data_len);
+    if (err == NRF_ERROR_NOT_FOUND) {
+        return false;
+    }
+    APP_ERROR_CHECK(err);
+
+    // Restore CTS client handles
+    cts_handles.cts_handle =
+            peer_service_cts->charateristics[0].characteristic.handle_value;
+    cts_handles.cts_cccd_handle =
+            peer_service_cts->charateristics[0].cccd_handle;
+    err = ble_cts_c_handles_assign(get_cts(), conn_handle, &cts_handles);
+    APP_ERROR_CHECK(err);
+
+    // Restore GATTS client handles
+    err = nrf_ble_gatts_c_handles_assign(get_gatts_c(), conn_handle,
+                                         &peer_service_gatts->charateristics[0]);
+    APP_ERROR_CHECK(err);
+
+    // Restore ANCS client handles
+    ancs_handles.control_point_char =
+            peer_service_ancs->charateristics[0].characteristic;
+    ancs_handles.notif_source_char =
+            peer_service_ancs->charateristics[1].characteristic;
+    ancs_handles.notif_source_cccd.handle =
+            peer_service_ancs->charateristics[1].cccd_handle;
+    ancs_handles.data_source_char =
+            peer_service_ancs->charateristics[2].characteristic;
+    ancs_handles.data_source_cccd.handle =
+            peer_service_ancs->charateristics[2].cccd_handle;
+    err = nrf_ble_ancs_c_handles_assign(get_ancs(), conn_handle, &ancs_handles);
+    APP_ERROR_CHECK(err);
+
+    return true;
+}
 
 
 /**@brief Function for handling Peer Manager events.
@@ -43,16 +185,40 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
     pm_handler_flash_clean(p_evt);
 
     switch (p_evt->evt_id) {
-        case PM_EVT_CONN_SEC_SUCCEEDED:
-            err = nrf_ble_gatts_c_handles_assign(get_gatts_c(),
-                                                 p_evt->conn_handle, NULL);
-            APP_ERROR_CHECK(err);
+        case PM_EVT_BONDED_PEER_CONNECTED:
+            if (p_evt->peer_id != PM_PEER_ID_INVALID) {
+                break;
+            }
+            if (!load_handles(p_evt->peer_id, p_evt->conn_handle)) {
+                err = nrf_ble_gatts_c_handles_assign(get_gatts_c(),
+                                                     p_evt->conn_handle, NULL);
+                APP_ERROR_CHECK(err);
 
-            // Discover peer's services
-            ble_db_discovery_t *discovery_db = get_discovery_db();
-            memset(discovery_db, 0, sizeof(ble_db_discovery_t));
-            err = ble_db_discovery_start(discovery_db, p_evt->conn_handle);
-            APP_ERROR_CHECK(err);
+                // Discover peer's services
+                ble_db_discovery_t *discovery_db = get_discovery_db();
+                peer_services_undiscovered = NUM_PEER_SERVICES;
+                memset(discovery_db, 0, sizeof(ble_db_discovery_t));
+                err = ble_db_discovery_start(discovery_db, p_evt->conn_handle);
+                APP_ERROR_CHECK(err);
+
+            }
+
+
+        case PM_EVT_CONN_SEC_SUCCEEDED:
+            if (get_gatts_c()->srv_changed_char.characteristic.handle_value ==
+                BLE_GATT_HANDLE_INVALID) {
+                err = nrf_ble_gatts_c_handles_assign(get_gatts_c(),
+                                                     p_evt->conn_handle, NULL);
+                APP_ERROR_CHECK(err);
+
+                // Discover peer's services
+                ble_db_discovery_t *discovery_db = get_discovery_db();
+                peer_services_undiscovered = NUM_PEER_SERVICES;
+                memset(discovery_db, 0, sizeof(ble_db_discovery_t));
+                err = ble_db_discovery_start(discovery_db, p_evt->conn_handle);
+                APP_ERROR_CHECK(err);
+
+            }
             break;
 
         case PM_EVT_PEERS_DELETE_SUCCEEDED:

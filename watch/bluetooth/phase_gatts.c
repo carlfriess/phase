@@ -9,6 +9,7 @@
 #include "nrf_log.h"
 
 #include "phase_gatt.h"
+#include "phase_peer_manager.h"
 
 
 NRF_BLE_GATTS_C_DEF(gatts_c);
@@ -35,8 +36,13 @@ static void gatts_c_evt_handler(nrf_ble_gatts_c_evt_t *p_evt) {
             err = nrf_ble_gatts_c_handles_assign(&gatts_c,
                                                  p_evt->conn_handle,
                                                  &p_evt->params
-                                                    .srv_changed_char);
+                                                         .srv_changed_char);
             APP_ERROR_CHECK(err);
+
+            // Register discovered service with peer manager
+            discovered_gatts(p_evt->conn_handle,
+                             &p_evt->params.srv_changed_char);
+
             err = nrf_ble_gatts_c_enable_indication(&gatts_c, true);
             APP_ERROR_CHECK(err);
             break;

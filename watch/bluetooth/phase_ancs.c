@@ -9,6 +9,7 @@
 
 #include "phase_bluetooth_handlers.h"
 #include "phase_gatt.h"
+#include "phase_peer_manager.h"
 
 
 BLE_ANCS_C_DEF(ancs);
@@ -75,6 +76,9 @@ static void ancs_c_evt_handler(ble_ancs_c_evt_t *evt) {
             ret = nrf_ble_ancs_c_handles_assign(&ancs, evt->conn_handle,
                                                 &evt->service);
             APP_ERROR_CHECK(ret);
+
+            // Register discovered service with peer manager
+            discovered_ancs(evt->conn_handle, &evt->service);
 
             // Delay because we cannot add a CCCD too close to starting
             // encryption (iOS specific).
