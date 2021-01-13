@@ -9,6 +9,6 @@
 #include <map>
 #include <string>
 
-extern const std::map<std::string, const uint8_t *> icons;
+extern const std::map<const std::string, const uint8_t *> icons;
 
 #endif //PHASE_ICONS_H

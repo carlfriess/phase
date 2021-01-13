@@ -15,7 +15,7 @@
 extern const uint8_t net_whatsapp_WhatsApp[];
 //extern const uint8_t ph_telegra_Telegraph[];
 
-const std::map<std::string, const uint8_t *> icons = {
+const std::map<const std::string, const uint8_t *> icons = {
 //        {"com.apple.Passbook", com_apple_Passbook},
 //        {"com.apple.mobilecal", com_apple_mobilecal},
 //        {"com.apple.mobilemail", com_apple_mobilemail},
