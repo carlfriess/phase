@@ -62,6 +62,7 @@ static void gatts_c_evt_handler(nrf_ble_gatts_c_evt_t *p_evt) {
             NRF_LOG_DEBUG("Service Changed indication received.");
 
             // Discover peer's services
+            NRF_LOG_INFO("Rediscovering peer's services...");
             ble_db_discovery_t *discovery_db = get_discovery_db();
             memset(discovery_db, 0, sizeof(ble_db_discovery_t));
             err = ble_db_discovery_start(discovery_db, p_evt->conn_handle);

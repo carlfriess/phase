@@ -138,6 +138,8 @@ static bool load_handles(pm_peer_id_t peer_id, uint16_t conn_handle) {
     uint32_t data_len = sizeof(peer_services);
     err = pm_peer_data_remote_db_load(peer_id, peer_services, &data_len);
     if (err == NRF_ERROR_NOT_FOUND) {
+        NRF_LOG_INFO("Remote database for peer %d not found in flash!",
+                     peer_id);
         return false;
     }
     APP_ERROR_CHECK(err);
@@ -169,6 +171,8 @@ static bool load_handles(pm_peer_id_t peer_id, uint16_t conn_handle) {
     err = nrf_ble_ancs_c_handles_assign(get_ancs(), conn_handle, &ancs_handles);
     APP_ERROR_CHECK(err);
 
+    NRF_LOG_INFO("Remote database for peer %d restored from flash!", peer_id);
+
     return true;
 }
 
@@ -186,7 +190,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
 
     switch (p_evt->evt_id) {
         case PM_EVT_BONDED_PEER_CONNECTED:
-            if (p_evt->peer_id != PM_PEER_ID_INVALID) {
+            if (p_evt->peer_id == PM_PEER_ID_INVALID) {
                 break;
             }
             if (!load_handles(p_evt->peer_id, p_evt->conn_handle)) {
@@ -195,6 +199,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                 APP_ERROR_CHECK(err);
 
                 // Discover peer's services
+                NRF_LOG_INFO("Discovering peer's services...");
                 ble_db_discovery_t *discovery_db = get_discovery_db();
                 peer_services_undiscovered = NUM_PEER_SERVICES;
                 memset(discovery_db, 0, sizeof(ble_db_discovery_t));
@@ -202,7 +207,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                 APP_ERROR_CHECK(err);
 
             }
-
+            break;
 
         case PM_EVT_CONN_SEC_SUCCEEDED:
             if (get_gatts_c()->srv_changed_char.characteristic.handle_value ==
@@ -212,6 +217,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt) {
                 APP_ERROR_CHECK(err);
 
                 // Discover peer's services
+                NRF_LOG_INFO("Discovering peer's services...");
                 ble_db_discovery_t *discovery_db = get_discovery_db();
                 peer_services_undiscovered = NUM_PEER_SERVICES;
                 memset(discovery_db, 0, sizeof(ble_db_discovery_t));
