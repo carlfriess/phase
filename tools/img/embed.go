@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -86,6 +87,7 @@ func main() {
 	// Determine the name of the image
 	name := filepath.Base(outputFile)
 	name = name[0:len(name) - len(filepath.Ext(name))]
+	name = strings.ReplaceAll(name, ".", "_")
 
 	// Parse the template and execute it
 	if t, err := template.ParseFiles(templateFile); err != nil {

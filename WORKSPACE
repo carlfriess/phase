@@ -100,3 +100,9 @@ http_archive(
     strip_prefix = "utfcpp-3.1.2",
     url = "https://github.com/nemtrif/utfcpp/archive/v3.1.2.tar.gz",
 )
+
+# Icon library dependencies
+
+load("//lib/icons:deps.bzl", "icons_deps")
+
+icons_deps()
