@@ -38,6 +38,8 @@ void TextView::render(uint8_t *buffer, Frame region) const {
         glyph_t cur = utf8::next(it, text.end());
         if (cur == '\n') {
             continue;
+        } else if (cur == 0xA0) {
+            cur = ' ';
         }
 
         // Fetch the next glyph
@@ -87,6 +89,11 @@ size_t TextView::setText(const std::string str) {
         } else if (std::isspace(cur)) {
             last_ws = it;
             last_ws_width = width;
+        }
+
+        // Handle no-break space
+        if (cur == 0xA0) {
+            cur = ' ';
         }
 
         // Lookup the next glyph
