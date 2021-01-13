@@ -24,26 +24,36 @@ NotificationView::NotificationView(const char *title,
     setOpaque(false);
 
     Frame icon_frame{};
-    icon_frame.width = app_icon_mask_width;
-    icon_frame.height = app_icon_mask_height;
-    icon_frame.origin.x =
-            frame.origin.x + (frame.width / 2) - (icon_frame.width / 2);
-    icon_frame.origin.y = frame.origin.y;
-    auto icon_view = new ImageView(icon, icon_frame);
-    icon_view->setMask(app_icon_mask);
+    ImageView *icon_view;
+    if (icon) {
+        icon_frame.width = app_icon_mask_width;
+        icon_frame.height = app_icon_mask_height;
+        icon_frame.origin.x =
+                frame.origin.x + (frame.width / 2) - (icon_frame.width / 2);
+        icon_frame.origin.y = frame.origin.y;
+        icon_view = new ImageView(icon, icon_frame);
+        icon_view->setMask(app_icon_mask);
+    }
 
     Frame content_frame{};
     content_frame.origin.x = frame.origin.x;
-    content_frame.origin.y = frame.origin.y + (icon_frame.height / 2);
+    content_frame.origin.y = frame.origin.y;
     content_frame.width = frame.width;
-    content_frame.height = frame.height - (icon_frame.height / 2);
+    content_frame.height = frame.height;
+    if (icon) {
+        content_frame.origin.y += (icon_frame.height / 2);
+        content_frame.height -= (icon_frame.height / 2);
+    }
     auto content_view = new View(content_frame);
     content_view->setBackgroundColor(white);
     addChildView(content_view);
 
     Frame text_frame{};
     text_frame.origin.x = content_frame.origin.x;
-    text_frame.origin.y = content_frame.origin.y + (icon_frame.height / 2) + 4;
+    text_frame.origin.y = content_frame.origin.y + 4;
+    if (icon) {
+        text_frame.origin.y += (icon_frame.height / 2);
+    }
     text_frame.width = content_frame.width;
     text_frame.height = title_font->height;
     auto title_view = new TextView(title_font, text_frame);
@@ -60,7 +70,9 @@ NotificationView::NotificationView(const char *title,
     body_view->setOpaque(false);
     content_view->addChildView(body_view);
 
-    addChildView(icon_view);
+    if (icon) {
+        addChildView(icon_view);
+    }
 
 }
 
