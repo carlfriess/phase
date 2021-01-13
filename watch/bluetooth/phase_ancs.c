@@ -94,8 +94,7 @@ static void ancs_c_evt_handler(ble_ancs_c_evt_t *evt) {
         case BLE_ANCS_C_EVT_NOTIF:
             // Check if we want to display this notification
             if (evt->notif.evt_id == BLE_ANCS_EVENT_ID_NOTIFICATION_ADDED &&
-                !evt->notif.evt_flags.pre_existing &&
-                !evt->notif.evt_flags.silent) {
+                !evt->notif.evt_flags.pre_existing) {
                 // Request the notification attributes
                 nrf_ble_ancs_c_request_attrs(&ancs, &evt->notif);
             }
