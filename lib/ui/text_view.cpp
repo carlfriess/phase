@@ -35,7 +35,8 @@ void TextView::render(uint8_t *buffer, Frame region) const {
     while (it < text.end()) {
 
         // Get next UTF-8 character
-        glyph_t cur = utf8::next(it, text.end());
+        uint32_t cur;
+        utf8::next(it, text.end(), cur);
         if (cur == '\n') {
             continue;
         } else if (cur == 0xA0) {
@@ -75,7 +76,7 @@ size_t TextView::setText(const std::string str) {
 
     Coord width = 0;
     Coord last_ws_width = 0;
-    utf8::uint32_t prev = 0;
+    uint32_t prev = 0;
 
     // Iterate string and calculate width until frame width is exceeded
     auto it = str.begin();
@@ -83,15 +84,13 @@ size_t TextView::setText(const std::string str) {
     while (it < str.end()) {
 
         // Get next UTF-8 character
-        // Using the internal function to avoid throwing an exception, since the
-        // target does not support exception handling.
-        utf8::uint32_t cur;
-        if (utf8::internal::validate_next(it, str.end(), cur) !=
-            utf8::internal::UTF8_OK) {
+        uint32_t cur;
+        auto prev_it = it;
+        if (utf8::next(it, str.end(), cur) != utf8::UTF8_OK) {
             break;
         } else if (cur == '\n') {
             break;
-        } else if (std::isspace(static_cast<unsigned char>(cur))) {
+        } else if (cur <= 0x7F && std::isspace(cur)) {
             last_ws = it;
             last_ws_width = width;
         }
@@ -118,7 +117,7 @@ size_t TextView::setText(const std::string str) {
                 it = last_ws;
                 width = last_ws_width;
             } else {
-                utf8::prior(it, str.begin());
+                it = prev_it;
             }
             break;
         }

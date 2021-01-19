@@ -31,8 +31,8 @@ cc_library(
     includes = ["ui/include"],
     linkopts = nRF5_linkopts,
     deps = [
+        ":utf8",
         "@fontem//:libfontem",
-        "@utfcpp",
     ],
 )
 

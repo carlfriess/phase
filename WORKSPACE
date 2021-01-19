@@ -91,16 +91,6 @@ http_archive(
     url = "https://github.com/chrisy/fontem/archive/475c24b9df89e3def8314b5d89de13c3d3069d25.zip",
 )
 
-# utfcpp - UTF-8 Library
-
-http_archive(
-    name = "utfcpp",
-    build_file = "@//external/utfcpp:utfcpp.BUILD",
-    sha256 = "fea3bfa39fb8bd7368077ea5e1e0db9a8951f7e6fb6d9400b00ab3d92b807c6d",
-    strip_prefix = "utfcpp-3.1.2",
-    url = "https://github.com/nemtrif/utfcpp/archive/v3.1.2.tar.gz",
-)
-
 # Icon library dependencies
 
 load("//lib/icons:deps.bzl", "icons_deps")
