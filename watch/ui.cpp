@@ -223,5 +223,6 @@ void ui_remove_notification() {
     if (notification_view) {
         root.removeChildView(notification_view);
         delete notification_view;
+        notification_view = nullptr;
     }
 }
