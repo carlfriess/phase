@@ -66,3 +66,25 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "utf8",
+    srcs = [
+        "utf8/decode.h",
+        "utf8/utf8.cpp",
+    ],
+    hdrs = ["utf8/include/utf8.h"],
+    copts = nRF5_copts,
+    includes = ["utf8/include"],
+    linkopts = nRF5_linkopts,
+)
+
+cc_test(
+    name = "utf8_test",
+    srcs = ["utf8/utf8_test.cpp"],
+    deps = [
+        ":utf8",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
