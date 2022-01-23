@@ -69,7 +69,7 @@ def icons_deps():
 
     http_file(
         name = "net.whatsapp.WhatsApp_icon",
-        sha256 = "575d0cdd3d1391c6142189c2e1c0392e09a0034510f05b69c5768fb97c752c42",
+        sha256 = "d5e06c22f14340ed39ac1d0af22f5e4dd9cdca420cd4749e193d126794355035",
         urls = ["https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/7a/7e/75/7a7e7562-fd84-d0a2-c0af-6a55f0864c0d/source/60x60bb.png"],
     )
 
