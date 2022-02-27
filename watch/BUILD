@@ -108,6 +108,7 @@ nRF5_binary(
         "-Wl,-Map=output.map",
     ],
     sdk_config_prefix = "config",
+    softdevice = "S132",
     deps = [
         "//lib:GC9A01",
         "//lib:ui",

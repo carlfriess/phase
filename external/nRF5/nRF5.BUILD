@@ -18,10 +18,31 @@ filegroup(
         "external/utf_converter/*.h",
         "integration/nrfx/**/*.h",
         "modules/nrfx/**/*.h",
-    ] + [
+    ]),
+)
+
+filegroup(
+    name = "hdrs_nosd",
+    srcs = glob([
+        "components/drivers_nrf/nrf_soc_nosd/*.h",
+    ]),
+)
+
+filegroup(
+    name = "hdrs_s132",
+    srcs = glob([
         "components/softdevice/common/*.h",
         "components/softdevice/s132/headers/*.h",
         "components/softdevice/s132/headers/nrf52/*.h",
+    ]),
+)
+
+filegroup(
+    name = "hdrs_s140",
+    srcs = glob([
+        "components/softdevice/common/*.h",
+        "components/softdevice/s140/headers/*.h",
+        "components/softdevice/s140/headers/nrf52/*.h",
     ]),
 )
 
@@ -113,10 +134,22 @@ includes = glob(
     "modules/nrfx/drivers/include",
     "modules/nrfx/hal",
     "modules/nrfx/mdk",
-] + [
+]
+
+includes_nosd = [
+    "components/drivers_nrf/nrf_soc_nosd",
+]
+
+includes_s132 = [
     "components/softdevice/common",
     "components/softdevice/s132/headers",
     "components/softdevice/s132/headers/nrf52",
+]
+
+includes_s140 = [
+    "components/softdevice/common",
+    "components/softdevice/s140/headers",
+    "components/softdevice/s140/headers/nrf52",
 ]
 
 cc_library(
@@ -132,6 +165,27 @@ cc_library(
     deps = [
         "modules/nrfx/mdk/nrf_common.ld",
     ],
+)
+
+cc_library(
+    name = "nosd",
+    srcs = [":hdrs_nosd"],
+    hdrs = [":hdrs_nosd"],
+    includes = includes_nosd,
+)
+
+cc_library(
+    name = "s132",
+    srcs = [":hdrs_s132"],
+    hdrs = [":hdrs_s132"],
+    includes = includes_s132,
+)
+
+cc_library(
+    name = "s140",
+    srcs = [":hdrs_s140"],
+    hdrs = [":hdrs_s140"],
+    includes = includes_s140,
 )
 
 exports_files(glob(["**"]))
@@ -183,8 +237,8 @@ nRF5_binary(
         "modules/nrfx/mdk/system_nrf52.c",
         "modules/nrfx/soc/nrfx_atomic.c",
     ],
-    linker_cmd = "examples/peripheral/blinky/pca10040/s132/armgcc/blinky_gcc_nrf52.ld",
-    sdk_config_prefix = "examples/peripheral/blinky/pca10040/s132/config",
+    linker_cmd = "examples/peripheral/blinky/pca10040/blank/armgcc/blinky_gcc_nrf52.ld",
+    sdk_config_prefix = "examples/peripheral/blinky/pca10040/blank/config",
 )
 
 nRF5_binary(
@@ -269,6 +323,7 @@ nRF5_binary(
     ],
     linker_cmd = "examples/ble_peripheral/ble_app_cts_c/pca10040/s132/armgcc/ble_app_cts_c_gcc_nrf52.ld",
     sdk_config_prefix = "examples/ble_peripheral/ble_app_cts_c/pca10040/s132/config",
+    softdevice = "S132",
     visibility = ["//visibility:private"],
 )
 
@@ -357,5 +412,6 @@ nRF5_binary(
     ],
     linker_cmd = "examples/ble_peripheral/ble_app_ancs_c/pca10040/s132/armgcc/ble_app_ancs_c_gcc_nrf52.ld",
     sdk_config_prefix = "examples/ble_peripheral/ble_app_ancs_c/pca10040/s132/config",
+    softdevice = "S132",
     visibility = ["//visibility:private"],
 )

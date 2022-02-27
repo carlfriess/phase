@@ -38,6 +38,8 @@ def nRF5_binary(
         includes = [],
         linker_cmd = None,
         linkopts = [],
+        board = "PCA10040",
+        softdevice = None,
         deps = [],
         **kwargs):
     """Compiles an executable binary using the Nordic nRF5 SDK.
@@ -51,6 +53,8 @@ def nRF5_binary(
         includes: cc_binary includes.
         linker: Path or label to an .ld linker command file.
         linkopts: cc_binary linkopts.
+        boards: Identifier of target board.
+        softdevice: Soft device to build against.
         deps: cc_binary deps.
         **kwargs: Additional cc_binary arguments.
     """
@@ -58,8 +62,52 @@ def nRF5_binary(
     if name == None:
         name = native.package_name().split("/")[-1]
 
+    if sdk_config_prefix == None:
+        fail("SDK configuration prefix not defined for {}: sdk_config_prefix = \"path/to/config\", ".format(name))
+
     if linker_cmd == None:
         fail("Linker script not defined for {}: linker = \"path/to/linker.ld\", ".format(name))
+
+    if board == "PCA10040":
+        defines_board = [
+            "BOARD_PCA10040",
+            "NRF52832_XXAA",
+            "NRF52",
+            "NRF52_PAN_74",
+        ]
+    elif board == "PCA10056":
+        defines_board = [
+            "BOARD_PCA10056",
+            "NRF52840_XXAA",
+        ]
+    else:
+        fail("Unknown board defined for {}: {}".format(name, board))
+
+    if softdevice == None:
+        defines_softdevice = []
+        deps_softdevice = [
+            "@nRF5//:nosd",
+        ]
+    elif softdevice == "S132":
+        defines_softdevice = [
+            "NRF_SD_BLE_API_VERSION=7",
+            "S132",
+            "SOFTDEVICE_PRESENT",
+        ]
+        deps_softdevice = [
+            "@nRF5//:s132",
+        ]
+    elif softdevice == "S140":
+        defines_softdevice = [
+            "NRF_SD_BLE_API_VERSION=7",
+            "S140",
+            "SOFTDEVICE_PRESENT",
+        ]
+        deps_softdevice = [
+            "@nRF5//:s140",
+        ]
+    else:
+        fail("Unknown soft device defined for {}: {}".format(name, softdevice))
 
     native.cc_binary(
         name = name + "_out",
@@ -67,18 +115,7 @@ def nRF5_binary(
             paths.join(sdk_config_prefix, "sdk_config.h"),
         ],
         copts = copts + nRF5_copts,
-        # TODO: Find a better way to add board defines
-        defines = defines + [
-            "BOARD_PCA10040",
-            "NRF52832_XXAA",
-            "NRF52",
-            "NRF52832_XXAA",
-            "NRF52_PAN_74",
-        ] + [
-            "NRF_SD_BLE_API_VERSION=7",
-            "S132",
-            "SOFTDEVICE_PRESENT",
-        ] + [
+        defines = defines + defines_board + defines_softdevice + [
             "APP_TIMER_V2",
             "APP_TIMER_V2_RTC1_ENABLED",
             "CONFIG_GPIO_AS_PINRESET",
@@ -96,7 +133,7 @@ def nRF5_binary(
         deps = deps + [
             "@nRF5//:sdk",
             linker_cmd,
-        ],
+        ] + deps_softdevice,
         **kwargs
     )
 
@@ -125,16 +162,17 @@ def nRF5_binary(
         visibility = ["//visibility:private"],
     )
 
-    native.genrule(
-        name = name + "_s132_hex",
-        srcs = [
-            ":" + name + "_hex",
-            "@nRF5//:components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex",
-        ],
-        outs = [name + "_s132.hex"],
-        cmd = "$(location :" + name + "_mergehex) -q -m $(SRCS) -o $(OUTS)",
-        tools = [":" + name + "_mergehex"],
-    )
+    if softdevice != None:
+        native.genrule(
+            name = name + "_" + softdevice.lower() + "_hex",
+            srcs = [
+                ":" + name + "_hex",
+                "@nRF5//:components/softdevice/" + softdevice.lower() + "/hex/" + softdevice.lower() + "_nrf52_7.2.0_softdevice.hex",
+            ],
+            outs = [name + "_" + softdevice.lower() + ".hex"],
+            cmd = "$(location :" + name + "_mergehex) -q -m $(SRCS) -o $(OUTS)",
+            tools = [":" + name + "_mergehex"],
+        )
 
     native.filegroup(
         name = name,
@@ -142,6 +180,5 @@ def nRF5_binary(
             name + "_out",
             name + "_bin",
             name + "_hex",
-            name + "_s132_hex",
-        ],
+        ] + [] if softdevice == None else [name + "_" + softdevice.lower() + "_hex"],
     )
