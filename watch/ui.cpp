@@ -20,7 +20,7 @@
 
 #define NRF_LOG_UI_FRAME(frame) NRF_LOG_DEBUG("(%d, %d) %d %d", frame.origin.x, frame.origin.y, frame.width, frame.height)
 
-#define CHUNK_SIZE  8
+#define CHUNK_SIZE  60
 #define IMG_BUF_AREA    (240 * CHUNK_SIZE)
 #define IMG_BUF_SIZE    (IMG_BUF_AREA * 3)
 

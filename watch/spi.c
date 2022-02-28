@@ -10,7 +10,11 @@
 #include "nrfx_ppi.h"
 #include "nrfx_timer.h"
 
+#if !NRFX_SPIM_EXTENDED_ENABLED
 #define SPI_INSTANCE  0     // SPI instance index
+#else
+#define SPI_INSTANCE  3     // SPI instance index
+#endif
 static const nrfx_spim_t spi = NRFX_SPIM_INSTANCE(SPI_INSTANCE);
 
 #define TIMER_INSTANCE  1   // Timer instance index
@@ -58,7 +62,11 @@ void spi_init(uint8_t sck, uint8_t mosi) {
     nrfx_spim_config_t spi_config = NRFX_SPIM_DEFAULT_CONFIG;
     spi_config.sck_pin = sck;
     spi_config.mosi_pin = mosi;
+#if !NRFX_SPIM_EXTENDED_ENABLED
     spi_config.frequency = NRF_SPIM_FREQ_8M;
+#else
+    spi_config.frequency = NRF_SPIM_FREQ_32M;
+#endif
     err = nrfx_spim_init(&spi, &spi_config, spi_event_handler, NULL);
     APP_ERROR_CHECK(err);
 
@@ -111,7 +119,11 @@ void spi_tx(const uint8_t *data, size_t len) {
     spi_xfer_done = false;
 
     // Use a simple transfer if the buffer is small enough
+#if !NRFX_SPIM_EXTENDED_ENABLED
     if (len <= 0xFF) {
+#else
+    if (len <= 0xFFFF) {
+#endif
         nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_XFER_TX(data, len);
         err = nrfx_spim_xfer(&spi, &xfer, 0);
         APP_ERROR_CHECK(err);
