@@ -1,0 +1,12 @@
+diff -Nur components/ble/ble_services/ble_ancs_c/nrf_ble_ancs_c.h components/ble/ble_services/ble_ancs_c/nrf_ble_ancs_c.h
+--- components/ble/ble_services/ble_ancs_c/nrf_ble_ancs_c.h
++++ components/ble/ble_services/ble_ancs_c/nrf_ble_ancs_c.h
+@@ -148,7 +148,7 @@
+                       BLE_ANCS_C_BLE_OBSERVER_PRIO,             \
+                       ble_ancs_c_on_ble_evt, &_name, _cnt)
+ 
+-#define BLE_ANCS_ATTR_DATA_MAX              32  //!< Maximum data length of an iOS notification attribute.
++#define BLE_ANCS_ATTR_DATA_MAX              128 //!< Maximum data length of an iOS notification attribute.
+ #define BLE_ANCS_NB_OF_CATEGORY_ID          12  //!< Number of iOS notification categories: Other, Incoming Call, Missed Call, Voice Mail, Social, Schedule, Email, News, Health and Fitness, Business and Finance, Location, Entertainment.
+ #define BLE_ANCS_NB_OF_NOTIF_ATTR           8   //!< Number of iOS notification attributes: AppIdentifier, Title, Subtitle, Message, MessageSize, Date, PositiveActionLabel, NegativeActionLabel.
+ #define BLE_ANCS_NB_OF_APP_ATTR             1   //!< Number of iOS application attributes: DisplayName.

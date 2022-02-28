@@ -179,6 +179,7 @@ cc_library(
     srcs = [":hdrs_s132"],
     hdrs = [":hdrs_s132"],
     includes = includes_s132,
+    linkstatic = 1,
 )
 
 cc_library(
@@ -186,6 +187,7 @@ cc_library(
     srcs = [":hdrs_s140"],
     hdrs = [":hdrs_s140"],
     includes = includes_s140,
+    linkstatic = 1,
 )
 
 exports_files(glob(["**"]))
