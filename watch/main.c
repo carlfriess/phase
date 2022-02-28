@@ -1,3 +1,4 @@
+#include "app_pwm.h"
 #include "app_scheduler.h"
 #include "app_timer.h"
 #include "nrf_delay.h"
@@ -26,6 +27,7 @@
 
 
 APP_TIMER_DEF(time_sync_timer);
+APP_PWM_INSTANCE(PWM2, 2);
 
 
 void GC9A01_set_reset(uint8_t val) {
@@ -97,12 +99,18 @@ int main(void) {
     nrf_gpio_cfg_output(GC9A01_RES);
     nrf_gpio_cfg_output(GC9A01_DC);
     nrf_gpio_cfg_output(GC9A01_CS);
-    nrf_gpio_cfg_output(BKL_PWM);
-    nrf_gpio_pin_write(BKL_PWM, 1);
     spi_init(GC9A01_SCL, GC9A01_SDA);
     GC9A01_init();
     ui_init();
     ui_update();
+
+    // Initialize backlight control
+    app_pwm_config_t pwm_config = APP_PWM_DEFAULT_CONFIG_1CH(1000L, BKL_PWM);
+    err = app_pwm_init(&PWM2, &pwm_config, NULL);
+    APP_ERROR_CHECK(err);
+    app_pwm_enable(&PWM2);
+    while((err = app_pwm_channel_duty_set(&PWM2, 0, 50)) == NRF_ERROR_BUSY);
+    APP_ERROR_CHECK(err);
 
     // Start advertising
     bluetooth_start_advertising(false);
