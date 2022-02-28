@@ -204,7 +204,8 @@ void ui_set_power(const struct power_status *status) {
     } else {
         char str[8];
         snprintf(str, sizeof(str), "%d.%dV", status->battery_voltage / 1000,
-                 status->battery_voltage / 100 % 10);
+                 static_cast<int>(
+                         status->battery_voltage % 1000 / 100.0f + 0.5f));
         power_view->setText(str);
     }
 }
