@@ -42,6 +42,7 @@ phase::ui::View root(phase::ui::watch::display_frame);
 
 phase::ui::TextView *time_view;
 phase::ui::TextView *date_view;
+phase::ui::TextView *power_view;
 
 phase::ui::watch::NotificationView *notification_view = nullptr;
 
@@ -80,6 +81,15 @@ void ui_init(void) {
     date_view->setVisible(false);
     date_view->setOpaque(false);
     root.addChildView(date_view);
+
+    phase::ui::Frame power_frame{};
+    power_frame.origin.x = 0;
+    power_frame.origin.y = 240 - 4 - font_opensans_12.height;
+    power_frame.width = 240;
+    power_frame.height = font_opensans_12.height;
+    power_view = new phase::ui::TextView(&font_opensans_12, power_frame);
+    power_view->setOpaque(false);
+    root.addChildView(power_view);
 
 }
 
@@ -185,6 +195,18 @@ void ui_set_date(const char *weekday, uint8_t day, const char *month) {
     snprintf(str, sizeof(str), "%s, %d %s", weekday, day, month);
     date_view->setVisible(true);
     date_view->setText(str);
+}
+
+void ui_set_power(const struct power_status *status) {
+    if (!power_view) return;
+    if (status->charging) {
+        power_view->setText("Charging");
+    } else {
+        char str[8];
+        snprintf(str, sizeof(str), "%d.%dV", status->battery_voltage / 1000,
+                 status->battery_voltage / 100 % 10);
+        power_view->setText(str);
+    }
 }
 
 void ui_add_notification(char *appid, char *title, char *msg) {

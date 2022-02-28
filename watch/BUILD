@@ -93,6 +93,7 @@ nRF5_binary(
         "@nRF5//:integration/nrfx/legacy/nrf_drv_uart.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_clock.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_gpiote.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_saadc.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_spi.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_spim.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_ppi.c",
@@ -107,6 +108,7 @@ nRF5_binary(
     board = "PCA10056",
     defines = [
         "CONFIG_NFCT_PINS_AS_GPIOS",
+        "NRFX_SAADC_API_V2",
     ],
     linker_cmd = "config/ble_app_ancs_c_gcc_nrf52.ld",
     linkopts = [

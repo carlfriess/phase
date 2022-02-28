@@ -13,6 +13,7 @@
 
 #include "bluetooth.h"
 #include "datetime.h"
+#include "power.h"
 #include "spi.h"
 #include "ui.h"
 
@@ -84,6 +85,9 @@ int main(void) {
     err = nrf_pwr_mgmt_init();
     APP_ERROR_CHECK(err);
 
+    // Initialize board power module
+    power_init(CHG_STATUS);
+
     // Initialize Bluetooth stack and services
     bluetooth_init();
 
@@ -102,6 +106,7 @@ int main(void) {
     spi_init(GC9A01_SCL, GC9A01_SDA);
     GC9A01_init();
     ui_init();
+    ui_set_power(&power_status);
     ui_update();
 
     // Initialize backlight control
