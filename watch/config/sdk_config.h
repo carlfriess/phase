@@ -51,6 +51,43 @@
 
 // <h> Pin configuration
 
+// <o> BKL_PWM  - Pin number
+
+// <0=> 0 (P0.0)
+// <1=> 1 (P0.1)
+// <2=> 2 (P0.2)
+// <3=> 3 (P0.3)
+// <4=> 4 (P0.4)
+// <5=> 5 (P0.5)
+// <6=> 6 (P0.6)
+// <7=> 7 (P0.7)
+// <8=> 8 (P0.8)
+// <9=> 9 (P0.9)
+// <10=> 10 (P0.10)
+// <11=> 11 (P0.11)
+// <12=> 12 (P0.12)
+// <13=> 13 (P0.13)
+// <14=> 14 (P0.14)
+// <15=> 15 (P0.15)
+// <16=> 16 (P0.16)
+// <17=> 17 (P0.17)
+// <18=> 18 (P0.18)
+// <19=> 19 (P0.19)
+// <20=> 20 (P0.20)
+// <21=> 21 (P0.21)
+// <22=> 22 (P0.22)
+// <23=> 23 (P0.23)
+// <24=> 24 (P0.24)
+// <25=> 25 (P0.25)
+// <26=> 26 (P0.26)
+// <27=> 27 (P0.27)
+// <28=> 28 (P0.28)
+// <29=> 29 (P0.29)
+// <30=> 30 (P0.30)
+// <31=> 31 (P0.31)
+
+#define BKL_PWM 17
+
 // <o> GC9A01_SCL  - Pin number
 
 // <0=> 0 (P0.0)
@@ -86,7 +123,7 @@
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
 
-#define GC9A01_SCL 28
+#define GC9A01_SCL 10
 
 // <o> GC9A01_SDA  - Pin number
 
@@ -123,7 +160,7 @@
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
 
-#define GC9A01_SDA 29
+#define GC9A01_SDA 12
 
 // <o> GC9A01_RES  - Pin number
 
@@ -160,7 +197,7 @@
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
 
-#define GC9A01_RES 3
+#define GC9A01_RES 9
 
 // <o> GC9A01_DC  - Pin number
 
@@ -197,7 +234,7 @@
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
 
-#define GC9A01_DC 4
+#define GC9A01_DC 26
 
 // <o> GC9A01_CS  - Pin number
 
@@ -234,7 +271,7 @@
 // <30=> 30 (P0.30)
 // <31=> 31 (P0.31)
 
-#define GC9A01_CS 31
+#define GC9A01_CS 14
 
 // </h>
 
@@ -6278,7 +6315,7 @@
 // <e> NRF_LOG_BACKEND_RTT_ENABLED - nrf_log_backend_rtt - Log RTT backend
 //==========================================================
 #ifndef NRF_LOG_BACKEND_RTT_ENABLED
-#define NRF_LOG_BACKEND_RTT_ENABLED 0
+#define NRF_LOG_BACKEND_RTT_ENABLED 1
 #endif
 // <o> NRF_LOG_BACKEND_RTT_TEMP_BUFFER_SIZE - Size of buffer for partially processed strings. 
 // <i> Size of the buffer is a trade-off between RAM usage and processing.
@@ -6311,7 +6348,7 @@
 // <e> NRF_LOG_BACKEND_UART_ENABLED - nrf_log_backend_uart - Log UART backend
 //==========================================================
 #ifndef NRF_LOG_BACKEND_UART_ENABLED
-#define NRF_LOG_BACKEND_UART_ENABLED 1
+#define NRF_LOG_BACKEND_UART_ENABLED 0
 #endif
 // <o> NRF_LOG_BACKEND_UART_TX_PIN - UART TX pin 
 #ifndef NRF_LOG_BACKEND_UART_TX_PIN

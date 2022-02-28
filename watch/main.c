@@ -97,6 +97,8 @@ int main(void) {
     nrf_gpio_cfg_output(GC9A01_RES);
     nrf_gpio_cfg_output(GC9A01_DC);
     nrf_gpio_cfg_output(GC9A01_CS);
+    nrf_gpio_cfg_output(BKL_PWM);
+    nrf_gpio_pin_write(BKL_PWM, 1);
     spi_init(GC9A01_SCL, GC9A01_SDA);
     GC9A01_init();
     ui_init();

@@ -103,6 +103,9 @@ nRF5_binary(
         "@nRF5//:modules/nrfx/soc/nrfx_atomic.c",
     ],
     board = "PCA10056",
+    defines = [
+        "CONFIG_NFCT_PINS_AS_GPIOS",
+    ],
     linker_cmd = "config/ble_app_ancs_c_gcc_nrf52.ld",
     linkopts = [
         "-lstdc++",
