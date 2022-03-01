@@ -5,6 +5,7 @@
 #include "ui.h"
 
 #include <cstdio>
+#include <cmath>
 
 #include "app_timer.h"
 #include "nrf_log.h"
@@ -203,9 +204,9 @@ void ui_set_power(const struct power_status *status) {
         power_view->setText("Charging");
     } else {
         char str[8];
-        snprintf(str, sizeof(str), "%d.%dV", status->battery_voltage / 1000,
-                 static_cast<int>(
-                         status->battery_voltage % 1000 / 100.0f + 0.5f));
+        int tenths = static_cast<int>(
+                std::round(status->battery_voltage / 100.0f));
+        snprintf(str, sizeof(str), "%d.%dV", tenths / 10, tenths % 10);
         power_view->setText(str);
     }
 }
