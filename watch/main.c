@@ -7,12 +7,14 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "nrf_pwr_mgmt.h"
+#include "nrf_twi_mngr.h"
 #include "sdk_config.h"
 
 #include "GC9A01.h"
 
 #include "bluetooth.h"
 #include "datetime.h"
+#include "haptics.h"
 #include "power.h"
 #include "spi.h"
 #include "ui.h"
@@ -26,7 +28,7 @@
 #define SCHED_QUEUE_SIZE            10                                  /**< Maximum number of events in the scheduler queue. */
 #endif
 
-
+NRF_TWI_MNGR_DEF(twi_manager, 8, 0);
 APP_TIMER_DEF(time_sync_timer);
 APP_PWM_INSTANCE(PWM2, 2);
 
@@ -116,6 +118,16 @@ int main(void) {
     app_pwm_enable(&PWM2);
     while((err = app_pwm_channel_duty_set(&PWM2, 0, 50)) == NRF_ERROR_BUSY);
     APP_ERROR_CHECK(err);
+
+    // Initialize I2C bus manager
+    nrf_drv_twi_config_t twi_config = NRFX_TWI_DEFAULT_CONFIG;
+    twi_config.scl = I2C_SCL;
+    twi_config.sda = I2C_SDA;
+    err = nrf_twi_mngr_init(&twi_manager, &twi_config);
+    APP_ERROR_CHECK(err);
+
+    // Initialize haptics
+    haptics_init(HPT_EN, &twi_manager);
 
     // Start advertising
     bluetooth_start_advertising(false);
