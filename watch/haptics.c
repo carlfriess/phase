@@ -4,6 +4,7 @@
 
 #include "haptics.h"
 
+#include "app_timer.h"
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 #include "nrf_log.h"
@@ -12,13 +13,26 @@
 
 #define SIZEOFARRAY(arr)    (sizeof(arr) / sizeof((arr)[0]))
 
+APP_TIMER_DEF(haptics_low_power_timer);
+
 static uint8_t hpt_en;
+
+static void enter_low_power_mode(void *ctx) {
+
+    // Put device in low power mode
+    nrf_gpio_pin_write(hpt_en, 0);
+
+}
 
 void haptics_init(uint8_t hpt_en_pin, const nrf_twi_mngr_t *twi_manager) {
 
     ret_code_t err;
 
     hpt_en = hpt_en_pin;
+
+    // Initialize app timer
+    err = app_timer_create(&haptics_low_power_timer, APP_TIMER_MODE_SINGLE_SHOT,
+                           enter_low_power_mode);
 
     // Enable DRV2605 haptic driver
     nrf_gpio_cfg_output(hpt_en);
@@ -143,26 +157,22 @@ void haptics_init(uint8_t hpt_en_pin, const nrf_twi_mngr_t *twi_manager) {
     // Put device in low power mode
     nrf_gpio_pin_write(hpt_en, 0);
 
-    nrf_delay_ms(1000);
-    haptics_play_effect(twi_manager, 54);
-
-}
-
-static void callback(ret_code_t err, void *data) {
-
 }
 
 void haptics_play_effect(const nrf_twi_mngr_t *twi_manager, uint8_t effect) {
 
     ret_code_t err;
 
+    // Stop the timer if it is already running
+    app_timer_stop(haptics_low_power_timer);
+
     // Enable the device
     nrf_gpio_pin_write(hpt_en, 1);
 
     // Effect sequence + GO
     static uint8_t seq[] = {0x04,
-                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                     0x01};
+                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                            0x01};
     seq[1] = effect;
 
     static const nrf_twi_mngr_transfer_t transfers[] = {
@@ -173,11 +183,15 @@ void haptics_play_effect(const nrf_twi_mngr_t *twi_manager, uint8_t effect) {
             .p_transfers = transfers,
             .number_of_transfers = SIZEOFARRAY(transfers),
             .p_required_twi_cfg = NULL,
-            .callback = callback,
+            .callback = NULL,
             .p_user_data = NULL,
     };
 
     err = nrf_twi_mngr_schedule(twi_manager, &transaction);
+    APP_ERROR_CHECK(err);
+
+    // Schedule the timer for disabling the haptic driver
+    err = app_timer_start(haptics_low_power_timer, APP_TIMER_TICKS(500), NULL);
     APP_ERROR_CHECK(err);
 
 }
