@@ -92,6 +92,16 @@ http_archive(
     url = "https://github.com/chrisy/fontem/archive/475c24b9df89e3def8314b5d89de13c3d3069d25.zip",
 )
 
+# BMI270-Sensor-API
+
+http_archive(
+    name = "bmi270",
+    build_file = "@//external/bmi270:bmi270.BUILD",
+    sha256 = "23e5a6978a44aae8b8df476eec924ce6dd6d003669958473fe878c60b5f14229",
+    strip_prefix = "BMI270-Sensor-API-2.71.8",
+    url = "https://github.com/BoschSensortec/BMI270-Sensor-API/archive/refs/tags/v2.71.8.zip",
+)
+
 # Icon library dependencies
 
 load("//lib/icons:deps.bzl", "icons_deps")
