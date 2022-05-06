@@ -15,6 +15,7 @@
 #include "bluetooth.h"
 #include "datetime.h"
 #include "haptics.h"
+#include "imu.h"
 #include "power.h"
 #include "spi.h"
 #include "ui.h"
@@ -129,6 +130,9 @@ int main(void) {
 
     // Initialize haptics
     haptics_init(HPT_EN, &twi_manager);
+
+    // Initialize IMU
+    imu_init(&twi_manager);
 
     // Start advertising
     bluetooth_start_advertising(false);

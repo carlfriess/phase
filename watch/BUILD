@@ -128,6 +128,7 @@ nRF5_binary(
         "//lib/fonts:opensans-bold-12",
         "//lib/fonts:quicksand-64",
         "//lib/icons",
+        "@bmi270",
     ],
 )
 
