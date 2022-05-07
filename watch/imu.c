@@ -105,11 +105,21 @@ int8_t imu_init(uint8_t int1, uint8_t int2, const nrf_twi_mngr_t *twi_manager) {
 
     int8_t res;
 
-    // Initialize status of wrist wear wakeup interrupt
-    uint16_t int_status = 0;
-
     // Sensor initialization configuration
-    struct bmi2_dev bmi2_dev;
+    struct bmi2_dev bmi2_dev = {
+
+            // Set device interface
+            .intf = BMI2_I2C_INTF,
+            .intf_ptr = (void *) twi_manager,
+            .read_write_len = 0xFE,
+            .read = bmi2_i2c_read,
+            .write = bmi2_i2c_write,
+            .delay_us = bmi2_delay_us,
+
+            // Assign to NULL to load the default config file
+            .config_file_ptr = NULL,
+
+    };
 
     // Select features and their pins to be mapped to
     struct bmi2_sens_int_config sens_int = {
@@ -136,17 +146,6 @@ int8_t imu_init(uint8_t int1, uint8_t int2, const nrf_twi_mngr_t *twi_manager) {
             .y = BMI2_X,
             .z = BMI2_NEG_Z,
     };
-
-    // Set device interface
-    bmi2_dev.intf = BMI2_I2C_INTF;
-    bmi2_dev.intf_ptr = (void *) twi_manager;
-    bmi2_dev.read_write_len = 0xFE;
-    bmi2_dev.read = bmi2_i2c_read;
-    bmi2_dev.write = bmi2_i2c_write;
-    bmi2_dev.delay_us = bmi2_delay_us;
-
-    // Assign to NULL to load the default config file
-    bmi2_dev.config_file_ptr = NULL;
 
     // Attempt to perform soft-reset of device
     uint8_t buf[2] = {0x7E, 0xB6};
