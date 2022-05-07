@@ -8,8 +8,8 @@
 #include "bmi270.h"
 #include "nrf_delay.h"
 #include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 #include "nrfx_gpiote.h"
-
 
 #define BMI270_ADR  BMI2_I2C_PRIM_ADDR
 
@@ -60,35 +60,56 @@ static void bmi2_delay_us(uint32_t period, void *intf_ptr) {
     nrf_delay_us(period);
 }
 
-static int8_t bmi2_set_config(struct bmi2_dev *bmi2_dev) {
+// Sensor initialization configuration
+static struct bmi2_dev bmi2_dev = {
+
+        // Device interface
+        .intf = BMI2_I2C_INTF,
+        .read_write_len = 0xFE,
+        .read = bmi2_i2c_read,
+        .write = bmi2_i2c_write,
+        .delay_us = bmi2_delay_us,
+
+        // Assign to NULL to load the default config file
+        .config_file_ptr = NULL,
+
+};
+
+static int8_t bmi2_set_config(struct bmi2_dev *dev) {
 
     int8_t res;
 
     // List the sensors which are required to enable
-    uint8_t sens_list[2] = {BMI2_ACCEL, BMI2_WRIST_WEAR_WAKE_UP};
+    uint8_t sens_list[3] = {
+            BMI2_ACCEL,
+            BMI2_WRIST_WEAR_WAKE_UP,
+            BMI2_WRIST_GESTURE
+    };
 
-    // Structure to define the type of the sensor and its configurations
-    struct bmi2_sens_config config;
-
-    // Configure type of feature
-    config.type = BMI2_WRIST_WEAR_WAKE_UP;
+    // Sensor configurations
+    struct bmi2_sens_config config[2] = {
+            {
+                    .type = BMI2_WRIST_WEAR_WAKE_UP,
+            },
+            {
+                    .type = BMI2_WRIST_GESTURE,
+            },
+    };
 
     // Enable the selected sensors
-    res = bmi270_sensor_enable(sens_list, 2, bmi2_dev);
+    res = bmi270_sensor_enable(sens_list, 3, dev);
+    if (res != BMI2_OK) return res;
 
-    if (res == BMI2_OK) {
+    // Get default configurations for the selected features
+    res = bmi270_get_sensor_config(config, 2, dev);
+    if (res != BMI2_OK) return res;
 
-        // Get default configurations for the type of feature selected
-        res = bmi270_get_sensor_config(&config, 1, bmi2_dev);
+    // Configure wrist gesture feature
+    config[1].cfg.wrist_gest.wearable_arm = BMI2_ARM_RIGHT;
 
-        if (res == BMI2_OK) {
-
-            // Set the new configuration
-            res = bmi270_set_sensor_config(&config, 1, bmi2_dev);
-
-        }
-
-    }
+    // Set the new configuration
+    res = bmi270_set_sensor_config(config, 2, dev);
+    if (res != BMI2_OK) return res;
 
     return res;
 }
@@ -98,33 +119,45 @@ static void int1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
 }
 
 static void int2_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-    NRF_LOG_INFO("IMU INT2");
+
+    int8_t res;
+    struct bmi2_feat_sensor_data sens_data = {
+            .type = BMI2_WRIST_GESTURE,
+    };
+    const char *gestures[6] = {
+            "unknown_gesture",
+            "push_arm_down",
+            "pivot_up",
+            "wrist_shake_jiggle",
+            "flick_in",
+            "flick_out",
+    };
+
+    // Fetch wrist data
+    res = bmi270_get_feature_data(&sens_data, 1, &bmi2_dev);
+    if (res != BMI2_OK) return;
+
+    NRF_LOG_INFO("%s", gestures[sens_data.sens_data.wrist_gesture_output]);
+
 }
 
 int8_t imu_init(uint8_t int1, uint8_t int2, const nrf_twi_mngr_t *twi_manager) {
 
     int8_t res;
 
-    // Sensor initialization configuration
-    struct bmi2_dev bmi2_dev = {
-
-            // Set device interface
-            .intf = BMI2_I2C_INTF,
-            .intf_ptr = (void *) twi_manager,
-            .read_write_len = 0xFE,
-            .read = bmi2_i2c_read,
-            .write = bmi2_i2c_write,
-            .delay_us = bmi2_delay_us,
-
-            // Assign to NULL to load the default config file
-            .config_file_ptr = NULL,
-
-    };
+    // Store TWI manager reference for use by I2C handlers
+    bmi2_dev.intf_ptr = (void *) twi_manager;
 
     // Select features and their pins to be mapped to
-    struct bmi2_sens_int_config sens_int = {
-            .type = BMI2_WRIST_WEAR_WAKE_UP,
-            .hw_int_pin = BMI2_INT1
+    struct bmi2_sens_int_config sens_int[2] = {
+            {
+                    .type = BMI2_WRIST_WEAR_WAKE_UP,
+                    .hw_int_pin = BMI2_INT1,
+            },
+            {
+                    .type = BMI2_WRIST_GESTURE,
+                    .hw_int_pin = BMI2_INT2,
+            },
     };
 
     // Interrupt pin configuration
@@ -168,8 +201,8 @@ int8_t imu_init(uint8_t int1, uint8_t int2, const nrf_twi_mngr_t *twi_manager) {
     res = bmi2_set_config(&bmi2_dev);
     if (res != BMI2_OK) return res;
 
-    // Map the feature interrupt
-    res = bmi270_map_feat_int(&sens_int, 1, &bmi2_dev);
+    // Map the features to interrupt pins
+    res = bmi270_map_feat_int(sens_int, 2, &bmi2_dev);
     if (res != BMI2_OK) return res;
 
     // Enable the interrupt pins
