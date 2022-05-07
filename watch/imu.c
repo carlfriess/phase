@@ -109,8 +109,8 @@ int8_t imu_init(const nrf_twi_mngr_t *twi_manager) {
 
     // Axes remap configuration
     struct bmi2_remap axes_remap = {
-            .x = BMI2_NEG_X,
-            .y = BMI2_Y,
+            .x = BMI2_Y,
+            .y = BMI2_X,
             .z = BMI2_NEG_Z,
     };
 
