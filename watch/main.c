@@ -1,4 +1,3 @@
-#include "app_pwm.h"
 #include "app_scheduler.h"
 #include "app_timer.h"
 #include "nrf_delay.h"
@@ -13,6 +12,7 @@
 
 #include "GC9A01.h"
 
+#include "backlight.h"
 #include "bluetooth.h"
 #include "datetime.h"
 #include "haptics.h"
@@ -32,8 +32,6 @@
 
 NRF_TWI_MNGR_DEF(twi_manager, 8, 0);
 APP_TIMER_DEF(time_sync_timer);
-APP_PWM_INSTANCE(PWM2, 2);
-
 
 void GC9A01_set_reset(uint8_t val) {
     nrf_gpio_pin_write(GC9A01_RES, val);
@@ -64,6 +62,11 @@ void bluetooth_time_handler(time_t time) {
 void bluetooth_notification_add(char *appid, char *title, char *msg) {
     ui_add_notification(appid, title, msg);
     haptics_play_effect(&twi_manager, 54);
+    backlight_wake();
+}
+
+void imu_wrist_wake() {
+    backlight_wake();
 }
 
 static void time_sync_handler(void *ctx) {
@@ -119,12 +122,7 @@ int main(void) {
     ui_update();
 
     // Initialize backlight control
-    app_pwm_config_t pwm_config = APP_PWM_DEFAULT_CONFIG_1CH(1000L, BKL_PWM);
-    err = app_pwm_init(&PWM2, &pwm_config, NULL);
-    APP_ERROR_CHECK(err);
-    app_pwm_enable(&PWM2);
-    while ((err = app_pwm_channel_duty_set(&PWM2, 0, 50)) == NRF_ERROR_BUSY);
-    APP_ERROR_CHECK(err);
+    backlight_init(BKL_PWM);
 
     // Initialize I2C bus manager
     nrf_drv_twi_config_t twi_config = NRFX_TWI_DEFAULT_CONFIG;

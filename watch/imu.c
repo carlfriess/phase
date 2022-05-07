@@ -8,7 +8,6 @@
 #include "bmi270.h"
 #include "nrf_delay.h"
 #include "nrf_log.h"
-#include "nrf_log_ctrl.h"
 #include "nrfx_gpiote.h"
 
 
@@ -95,7 +94,7 @@ static int8_t bmi2_set_config(struct bmi2_dev *bmi2_dev) {
 }
 
 static void int1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-    NRF_LOG_INFO("IMU INT1");
+    imu_wrist_wake();
 }
 
 static void int2_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
@@ -190,24 +189,6 @@ int8_t imu_init(uint8_t int1, uint8_t int2, const nrf_twi_mngr_t *twi_manager) {
     APP_ERROR_CHECK(err);
     nrfx_gpiote_in_event_enable(int1, true);
     nrfx_gpiote_in_event_enable(int2, true);
-
-    NRF_LOG_INFO("Tilt the board in landscape position to trigger wrist wear wakeup\n");
-    NRF_LOG_FLUSH();
-
-    // Loop to print the wrist wear wakeup data when interrupt occurs
-    while (1) {
-        int_status = 0;
-
-        // To get the interrupt status of the wrist wear wakeup
-        res = bmi2_get_int_status(&int_status, &bmi2_dev);
-
-        // To check the interrupt status of the wrist gesture
-        if ((res == BMI2_OK) && (int_status & BMI270_WRIST_WAKE_UP_STATUS_MASK)) {
-            NRF_LOG_INFO("Wrist wear wakeup detected\n");
-            NRF_LOG_FLUSH();
-            break;
-        }
-    }
 
     return res;
 }
