@@ -132,7 +132,10 @@ int main(void) {
     haptics_init(HPT_EN, &twi_manager);
 
     // Initialize IMU
-    imu_init(&twi_manager);
+    err = imu_init(&twi_manager);
+    if (err) {
+        NRF_LOG_ERROR("Failed to initialize IMU (%d)", err);
+    }
 
     // Start advertising
     bluetooth_start_advertising(false);

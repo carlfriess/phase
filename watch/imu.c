@@ -4,8 +4,6 @@
 
 #include "imu.h"
 
-#include <stdint.h>
-
 #include "bmi2.h"
 #include "bmi270.h"
 #include "nrf_delay.h"
@@ -93,7 +91,7 @@ static int8_t bmi2_set_config(struct bmi2_dev *bmi2_dev) {
     return res;
 }
 
-void imu_init(const nrf_twi_mngr_t *twi_manager) {
+int8_t imu_init(const nrf_twi_mngr_t *twi_manager) {
 
     int8_t res;
 
@@ -107,6 +105,13 @@ void imu_init(const nrf_twi_mngr_t *twi_manager) {
     struct bmi2_sens_int_config sens_int = {
             .type = BMI2_WRIST_WEAR_WAKE_UP,
             .hw_int_pin = BMI2_INT1
+    };
+
+    // Axes remap configuration
+    struct bmi2_remap axes_remap = {
+            .x = BMI2_NEG_X,
+            .y = BMI2_Y,
+            .z = BMI2_NEG_Z,
     };
 
     // Set device interface
@@ -128,48 +133,43 @@ void imu_init(const nrf_twi_mngr_t *twi_manager) {
     ret_code_t err = nrf_twi_mngr_perform(twi_manager, NULL, transfers, SIZEOFARRAY(transfers), NULL);
     if (err != NRF_SUCCESS) {
         NRF_LOG_ERROR("Failed to reset IMU");
-        return;
+        return BMI2_E_COM_FAIL;
     }
     nrf_delay_ms(2);
 
     // Initialize BMI270
     res = bmi270_init(&bmi2_dev);
+    if (res != BMI2_OK) return res;
 
-    if (res == BMI2_OK) {
+    // Set the sensor configuration
+    res = bmi2_set_config(&bmi2_dev);
+    if (res != BMI2_OK) return res;
 
-        // Set the sensor configuration
-        res = bmi2_set_config(&bmi2_dev);
+    // Map the feature interrupt
+    res = bmi270_map_feat_int(&sens_int, 1, &bmi2_dev);
+    if (res != BMI2_OK) return res;
 
-        if (res == BMI2_OK) {
+    // Remap axes
+    bmi2_set_remap_axes(&axes_remap, &bmi2_dev);
+    if (res != BMI2_OK) return res;
 
-            // Map the feature interrupt
-            res = bmi270_map_feat_int(&sens_int, 1, &bmi2_dev);
+    NRF_LOG_INFO("Tilt the board in landscape position to trigger wrist wear wakeup\n");
+    NRF_LOG_FLUSH();
 
-            if (res == BMI2_OK) {
+    // Loop to print the wrist wear wakeup data when interrupt occurs
+    while (1) {
+        int_status = 0;
 
-                NRF_LOG_INFO("Tilt the board in landscape position to trigger wrist wear wakeup\n");
-                NRF_LOG_FLUSH();
+        // To get the interrupt status of the wrist wear wakeup
+        res = bmi2_get_int_status(&int_status, &bmi2_dev);
 
-                // Loop to print the wrist wear wakeup data when interrupt occurs
-                while (1) {
-                    int_status = 0;
-
-                    // To get the interrupt status of the wrist wear wakeup
-                    res = bmi2_get_int_status(&int_status, &bmi2_dev);
-
-                    // To check the interrupt status of the wrist gesture
-                    if ((res == BMI2_OK) &&
-                        (int_status & BMI270_WRIST_WAKE_UP_STATUS_MASK)) {
-                        NRF_LOG_INFO("Wrist wear wakeup detected\n");
-                        NRF_LOG_FLUSH();
-                        break;
-                    }
-                }
-            }
-
-            return;
+        // To check the interrupt status of the wrist gesture
+        if ((res == BMI2_OK) && (int_status & BMI270_WRIST_WAKE_UP_STATUS_MASK)) {
+            NRF_LOG_INFO("Wrist wear wakeup detected\n");
+            NRF_LOG_FLUSH();
+            break;
         }
     }
 
-    NRF_LOG_ERROR("Failed to initialize IMU (%d)", res);
+    return res;
 }
