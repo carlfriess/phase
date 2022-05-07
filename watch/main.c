@@ -8,6 +8,7 @@
 #include "nrf_log_default_backends.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrf_twi_mngr.h"
+#include "nrfx_gpiote.h"
 #include "sdk_config.h"
 
 #include "GC9A01.h"
@@ -89,6 +90,10 @@ int main(void) {
     err = nrf_pwr_mgmt_init();
     APP_ERROR_CHECK(err);
 
+    // Initialize GPIO tasks & events module
+    err = nrfx_gpiote_init();
+    APP_ERROR_CHECK(err);
+
     // Initialize board power module
     power_init(CHG_STATUS);
 
@@ -118,7 +123,7 @@ int main(void) {
     err = app_pwm_init(&PWM2, &pwm_config, NULL);
     APP_ERROR_CHECK(err);
     app_pwm_enable(&PWM2);
-    while((err = app_pwm_channel_duty_set(&PWM2, 0, 50)) == NRF_ERROR_BUSY);
+    while ((err = app_pwm_channel_duty_set(&PWM2, 0, 50)) == NRF_ERROR_BUSY);
     APP_ERROR_CHECK(err);
 
     // Initialize I2C bus manager
@@ -132,7 +137,7 @@ int main(void) {
     haptics_init(HPT_EN, &twi_manager);
 
     // Initialize IMU
-    err = imu_init(&twi_manager);
+    err = imu_init(IMU_INT1, IMU_INT2, &twi_manager);
     if (err) {
         NRF_LOG_ERROR("Failed to initialize IMU (%d)", err);
     }

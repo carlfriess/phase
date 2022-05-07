@@ -9,6 +9,6 @@
 
 #include "nrf_twi_mngr.h"
 
-int8_t imu_init(const nrf_twi_mngr_t *twi_manager);
+int8_t imu_init(uint8_t int1, uint8_t int2, const nrf_twi_mngr_t *twi_manager);
 
 #endif //PHASE_IMU_H

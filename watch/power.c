@@ -60,10 +60,6 @@ void power_init(uint8_t chg_status) {
 
     ret_code_t err;
 
-    // Initialize GPIOTE module
-    err = nrfx_gpiote_init();
-    APP_ERROR_CHECK(err);
-
     // Configure charge status input interrupts
     nrfx_gpiote_in_config_t chg_conf = NRFX_GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
     err = nrfx_gpiote_in_init(chg_status, &chg_conf, chg_status_handler);
