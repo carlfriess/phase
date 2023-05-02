@@ -24,6 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Test UTF-8 library
-        run: bazelisk test //lib:utf8_test
+        run: bazelisk test --cxxopt=-std=c++14 //lib:utf8_test
       - name: Test UI library
-        run: bazelisk test //lib:ui_test
+        run: bazelisk test --cxxopt=-std=c++14 //lib:ui_test
