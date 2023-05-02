@@ -18,7 +18,7 @@ http_archive(
 
 git_repository(
     name = "arm_none_eabi",
-    commit = "ec83de68abbb7985287ac4e60962e26ec26e98e4",
+    commit = "7e7d22cc8f166d1f8cd8fcfee0e75742fab26cc7",
     remote = "https://github.com/carlfriess/bazel-arm-none-eabi",
 )
 
@@ -48,7 +48,7 @@ go_register_toolchains(version = "1.15.6")
 git_repository(
     name = "gtest",
     remote = "https://github.com/google/googletest",
-    tag = "release-1.10.0",
+    tag = "v1.13.0",
 )
 
 # Nordic nRF5 SDK
