@@ -25,5 +25,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Test UTF-8 library
         run: bazelisk test --cxxopt=-std=c++14 //lib:utf8_test
+      - name: Show test log
+        if: failure()
+        run: cat bazel-out/k8-fastbuild/testlogs/lib/utf8_test/test.log
       - name: Test UI library
         run: bazelisk test --cxxopt=-std=c++14 //lib:ui_test
+      - name: Show test log
+        if: failure()
+        run: cat bazel-out/k8-fastbuild/testlogs/lib/ui_test/test.log
