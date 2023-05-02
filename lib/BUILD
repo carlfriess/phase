@@ -59,6 +59,7 @@ cc_library(
 cc_test(
     name = "ui_test",
     srcs = glob(["ui/**/*_test.cpp"]),
+    copts = ["-fshort-enums"],
     deps = [
         ":ui",
         ":ui-watch",
@@ -82,6 +83,7 @@ cc_library(
 cc_test(
     name = "utf8_test",
     srcs = ["utf8/utf8_test.cpp"],
+    copts = ["-fshort-enums"],
     deps = [
         ":utf8",
         "@gtest",
