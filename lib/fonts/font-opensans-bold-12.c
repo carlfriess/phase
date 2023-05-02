@@ -10,7 +10,7 @@
 #include "fontem.h"
 #include "font-opensans-bold-12.h"
 
-/* Character list: !@#$%^&*()_+-={}|[]\:";'<>?,./`~ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÄÖÜßäöü */
+/* Character list: !@#$%^&*()_+-={}|[]\:";'<>?,./`~° ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÄÖÜßäöü */
 
 /** Kerning table for character ' '. */
 static const struct kerning kerning_opensans_bold_12_0020[] = {
@@ -3080,6 +3080,33 @@ static const struct glyph glyph_opensans_bold_12_007e = {
 	.kerning = kerning_opensans_bold_12_007e,
 };
 
+/** Bitmap definition for character '°'. */
+static const uint8_t bitmap_opensans_bold_12_00b0[] = {
+	0x00, 0x1d, 0xb8, 0xf6, 0xd2, 0x42, 0x00, 
+	0x00, 0xce, 0xf8, 0xa4, 0xe5, 0xf5, 0x1f, 
+	0x2a, 0xff, 0x7a, 0x00, 0x35, 0xff, 0x71, 
+	0x25, 0xff, 0x78, 0x00, 0x31, 0xff, 0x72, 
+	0x02, 0xcd, 0xf7, 0xa3, 0xe2, 0xf6, 0x20, 
+	0x00, 0x1e, 0xb6, 0xf3, 0xd4, 0x45, 0x00, 
+};
+
+/** Kerning table for character '°'. */
+static const struct kerning kerning_opensans_bold_12_00b0[] = {
+	{ /* .left = */ 0, /* .offset = */ 0 },
+};
+
+/** Glyph definition for character '°'. */
+static const struct glyph glyph_opensans_bold_12_00b0 = {
+	.glyph = 176,
+	.left = 0,
+	.top = 12,
+	.advance = 7,
+	.cols = 7,
+	.rows = 6,
+	.bitmap = bitmap_opensans_bold_12_00b0,
+	.kerning = kerning_opensans_bold_12_00b0,
+};
+
 /** Bitmap definition for character 'Ä'. */
 static const uint8_t bitmap_opensans_bold_12_00c4[] = {
 	0x00, 0x00, 0x00, 0x10, 0x24, 0x00, 0x02, 0x2e, 0x05, 0x00, 0x00, 0x00, 
@@ -3428,6 +3455,7 @@ static const struct glyph *glyphs_opensans_bold_12[] = {
 	&glyph_opensans_bold_12_007c,  /* U+007C '|' */
 	&glyph_opensans_bold_12_007d,  /* U+007D '}' */
 	&glyph_opensans_bold_12_007e,  /* U+007E '~' */
+	&glyph_opensans_bold_12_00b0,  /* U+00B0 '°' */
 	&glyph_opensans_bold_12_00c4,  /* U+00C4 'Ä' */
 	&glyph_opensans_bold_12_00d6,  /* U+00D6 'Ö' */
 	&glyph_opensans_bold_12_00dc,  /* U+00DC 'Ü' */
@@ -3443,7 +3471,7 @@ const struct font font_opensans_bold_12 = {
 	.style = "Bold",
 	.size = 12,
 	.dpi = 100,
-	.count = 102,
+	.count = 103,
 	.max = 252,
 	.ascender = 18,
 	.descender = -5,

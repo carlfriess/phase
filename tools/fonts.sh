@@ -30,5 +30,5 @@ export LC_ALL=en_US.UTF-8
 
 # Generate embedded font files
 fontem --name=quicksand --size=64 --chars=0123456789: --font=/tmp/fontem/Quicksand-Light.ttf --dir=lib/fonts
-fontem --name=opensans --size=12 --font=/tmp/fontem/OpenSans-Regular.ttf --dir=lib/fonts
-fontem --name=opensans-bold --size=12 --font=/tmp/fontem/OpenSans-Bold.ttf --dir=lib/fonts
+fontem --name=opensans --size=12 --chars="!@#$%^&*()_+-={}|[]\\:\";'<>?,./\`~° ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÄÖÜßäöü" --font=/tmp/fontem/OpenSans-Regular.ttf --dir=lib/fonts
+fontem --name=opensans-bold --size=12 --chars="!@#$%^&*()_+-={}|[]\\:\";'<>?,./\`~° ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÄÖÜßäöü" --font=/tmp/fontem/OpenSans-Bold.ttf --dir=lib/fonts

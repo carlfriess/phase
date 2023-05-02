@@ -10,7 +10,7 @@
 #include "fontem.h"
 #include "font-opensans-12.h"
 
-/* Character list: !@#$%^&*()_+-={}|[]\:";'<>?,./`~ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÄÖÜßäöü */
+/* Character list: !@#$%^&*()_+-={}|[]\:";'<>?,./`~° ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÄÖÜßäöü */
 
 /** Kerning table for character ' '. */
 static const struct kerning kerning_opensans_12_0020[] = {
@@ -3069,6 +3069,32 @@ static const struct glyph glyph_opensans_12_007e = {
 	.kerning = kerning_opensans_12_007e,
 };
 
+/** Bitmap definition for character '°'. */
+static const uint8_t bitmap_opensans_12_00b0[] = {
+	0x17, 0xb2, 0xf0, 0xcd, 0x36, 0x00, 
+	0xaf, 0x7c, 0x03, 0x3f, 0xe0, 0x08, 
+	0xe8, 0x10, 0x00, 0x00, 0xc8, 0x2d, 
+	0xb1, 0x7c, 0x03, 0x3e, 0xe5, 0x0a, 
+	0x19, 0xb4, 0xf2, 0xd3, 0x3c, 0x00, 
+};
+
+/** Kerning table for character '°'. */
+static const struct kerning kerning_opensans_12_00b0[] = {
+	{ /* .left = */ 0, /* .offset = */ 0 },
+};
+
+/** Glyph definition for character '°'. */
+static const struct glyph glyph_opensans_12_00b0 = {
+	.glyph = 176,
+	.left = 1,
+	.top = 12,
+	.advance = 7,
+	.cols = 6,
+	.rows = 5,
+	.bitmap = bitmap_opensans_12_00b0,
+	.kerning = kerning_opensans_12_00b0,
+};
+
 /** Bitmap definition for character 'Ä'. */
 static const uint8_t bitmap_opensans_12_00c4[] = {
 	0x00, 0x00, 0x00, 0xcd, 0x5e, 0x00, 0xa5, 0x83, 0x00, 0x00, 0x00, 
@@ -3411,6 +3437,7 @@ static const struct glyph *glyphs_opensans_12[] = {
 	&glyph_opensans_12_007c,  /* U+007C '|' */
 	&glyph_opensans_12_007d,  /* U+007D '}' */
 	&glyph_opensans_12_007e,  /* U+007E '~' */
+	&glyph_opensans_12_00b0,  /* U+00B0 '°' */
 	&glyph_opensans_12_00c4,  /* U+00C4 'Ä' */
 	&glyph_opensans_12_00d6,  /* U+00D6 'Ö' */
 	&glyph_opensans_12_00dc,  /* U+00DC 'Ü' */
@@ -3426,7 +3453,7 @@ const struct font font_opensans_12 = {
 	.style = "Regular",
 	.size = 12,
 	.dpi = 100,
-	.count = 102,
+	.count = 103,
 	.max = 252,
 	.ascender = 18,
 	.descender = -5,
