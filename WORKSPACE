@@ -57,9 +57,9 @@ http_archive(
     name = "nRF5",
     build_file = "@//external/nRF5:nRF5.BUILD",
     patches = ["@//external/nRF5:nrf_ble_ancs_c.patch"],
-    sha256 = "a577dab8946077d7fcde0e17dcb5460056c371eb599c8d25cbb50b6e9b27096e",
-    strip_prefix = "nRF5_SDK_17.0.2_d674dde",
-    url = "https://developer.nordicsemi.com/nRF5_SDK/nRF5_SDK_v17.x.x/nRF5_SDK_17.0.2_d674dde.zip",
+    sha256 = "5bfe38e744c39fd7f30e10077ba12df306ef91f368894795d6a3e7a62dc68061",
+    strip_prefix = "nRF5_SDK_17.1.0_ddde560",
+    url = "https://developer.nordicsemi.com/nRF5_SDK/nRF5_SDK_v17.x.x/nRF5_SDK_17.1.0_ddde560.zip",
 )
 
 # Nordic nRF command line tools
