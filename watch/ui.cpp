@@ -44,6 +44,7 @@ phase::ui::View root(phase::ui::watch::display_frame);
 phase::ui::TextView *time_view;
 phase::ui::TextView *date_view;
 phase::ui::TextView *power_view;
+phase::ui::TextView *temperature_view;
 
 phase::ui::watch::NotificationView *notification_view = nullptr;
 
@@ -91,6 +92,15 @@ void ui_init(void) {
     power_view = new phase::ui::TextView(&font_opensans_12, power_frame);
     power_view->setOpaque(false);
     root.addChildView(power_view);
+
+    phase::ui::Frame temperature_frame{};
+    temperature_frame.origin.x = 0;
+    temperature_frame.origin.y = 4;
+    temperature_frame.width = 240;
+    temperature_frame.height = font_opensans_12.height;
+    temperature_view = new phase::ui::TextView(&font_opensans_12, temperature_frame);
+    temperature_view->setOpaque(false);
+    root.addChildView(temperature_view);
 
 }
 
@@ -209,6 +219,14 @@ void ui_set_power(const struct power_status *status) {
         snprintf(str, sizeof(str), "%d.%dV", tenths / 10, tenths % 10);
         power_view->setText(str);
     }
+}
+
+
+void ui_set_temperature(int8_t temp) {
+    if (!temperature_view) return;
+    char str[8];
+    snprintf(str, sizeof(str), "%d°C", temp);
+    temperature_view->setText(str);
 }
 
 void ui_add_notification(char *appid, char *title, char *msg) {

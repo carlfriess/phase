@@ -54,6 +54,12 @@ static void timer_handler(void *ctx) {
     err = nrfx_saadc_mode_trigger();
     APP_ERROR_CHECK(err);
 
+    // Perform a temperature measurement
+    int32_t temperature;
+    if (sd_temp_get(&temperature) == NRF_SUCCESS) {
+        ui_set_temperature((int8_t) ((temperature + 2) >> 2));
+    }
+
 }
 
 void power_init(uint8_t chg_status) {
