@@ -55,6 +55,10 @@ void GC9A01_delay(uint16_t ms) {
     nrf_delay_ms(ms);
 }
 
+void bluetooth_state_handler(bool connected) {
+    ui_set_bluetooth_state(connected);
+}
+
 void bluetooth_time_handler(time_t time) {
     datetime_set(time);
     ui_set_datetime(time);

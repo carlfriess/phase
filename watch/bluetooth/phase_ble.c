@@ -17,6 +17,7 @@
 #include "phase_ancs.h"
 #include "phase_cts.h"
 #include "phase_peer_manager.h"
+#include "phase_bluetooth_handlers.h"
 
 
 #define APP_BLE_CONN_CFG_TAG    1       /**< A tag identifying the SoftDevice BLE configuration. */
@@ -58,6 +59,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
             cur_conn = p_ble_evt->evt.gap_evt.conn_handle;
             err_code = nrf_ble_qwr_conn_handle_assign(&ble_qwr, cur_conn);
             APP_ERROR_CHECK(err_code);
+            bluetooth_state_handler(true);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
@@ -70,6 +72,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
             if (p_ble_evt->evt.gap_evt.conn_handle == get_ancs()->conn_handle) {
                 get_ancs()->conn_handle = BLE_CONN_HANDLE_INVALID;
             }
+            bluetooth_state_handler(false);
             break;
 
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST: {

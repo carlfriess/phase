@@ -7,6 +7,10 @@
 
 #include <time.h>
 
+/**@brief Handler that is called when the bluetooth connection state changes.
+ */
+void bluetooth_state_handler(bool connected);
+
 /**@brief Handler that is called with the current time reported by the Current
  * Time Service.
  */

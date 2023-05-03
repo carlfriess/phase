@@ -26,6 +26,9 @@
 #define IMG_BUF_SIZE    (IMG_BUF_AREA * 3)
 
 extern const uint8_t background[];
+extern const uint8_t bluetooth_connected_icon[];
+extern const uint8_t bluetooth_disconnected_icon[];
+static uint8_t white_buffer[16*16*3];
 
 static uint8_t buf1[IMG_BUF_SIZE];
 static uint8_t buf2[IMG_BUF_SIZE];
@@ -44,6 +47,7 @@ phase::ui::View root(phase::ui::watch::display_frame);
 phase::ui::TextView *time_view;
 phase::ui::TextView *date_view;
 phase::ui::TextView *power_view;
+phase::ui::ImageView *bluetooth_icon_view;
 phase::ui::TextView *temperature_view;
 
 phase::ui::watch::NotificationView *notification_view = nullptr;
@@ -93,9 +97,19 @@ void ui_init(void) {
     power_view->setOpaque(false);
     root.addChildView(power_view);
 
+    phase::ui::Frame bluetooth_icon_frame{};
+    bluetooth_icon_frame.origin.x = 110;
+    bluetooth_icon_frame.origin.y = 4;
+    bluetooth_icon_frame.width = 16;
+    bluetooth_icon_frame.height = 16;
+    memset(white_buffer, 0xFF, sizeof(white_buffer));
+    bluetooth_icon_view = new phase::ui::ImageView(white_buffer, bluetooth_icon_frame);
+    bluetooth_icon_view->setVisible(false);
+    root.addChildView(bluetooth_icon_view);
+
     phase::ui::Frame temperature_frame{};
     temperature_frame.origin.x = 0;
-    temperature_frame.origin.y = 4;
+    temperature_frame.origin.y = 24;
     temperature_frame.width = 240;
     temperature_frame.height = font_opensans_12.height;
     temperature_view = new phase::ui::TextView(&font_opensans_12, temperature_frame);
@@ -221,6 +235,11 @@ void ui_set_power(const struct power_status *status) {
     }
 }
 
+void ui_set_bluetooth_state(bool connected) {
+    if (!bluetooth_icon_view) return;
+    bluetooth_icon_view->setVisible(true);
+    bluetooth_icon_view->setMask(connected ? bluetooth_connected_icon : bluetooth_disconnected_icon);
+}
 
 void ui_set_temperature(int8_t temp) {
     if (!temperature_view) return;

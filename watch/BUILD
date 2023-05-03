@@ -1,11 +1,21 @@
 load("@//external/nRF5:nRF5.bzl", "nRF5_binary")
-load("@//tools/img:embed.bzl", "embed_img")
+load("@//tools/img:embed.bzl", "embed_img", "embed_mask")
 
 # Photo by Manuel Will on Unsplash
 # https://unsplash.com/photos/gd3t5Dtbwkw
 embed_img(
     name = "background",
     img = "background.jpeg",
+)
+
+embed_mask(
+    name = "bluetooth_connected_icon",
+    img = "bluetooth_connected.png",
+)
+
+embed_mask(
+    name = "bluetooth_disconnected_icon",
+    img = "bluetooth_disconnected.png",
 )
 
 nRF5_binary(
@@ -18,6 +28,8 @@ nRF5_binary(
         exclude = ["config/*"],
     ) + [
         ":background",
+        ":bluetooth_connected_icon",
+        ":bluetooth_disconnected_icon",
         "@nRF5//:components/ble/ble_advertising/ble_advertising.c",
         "@nRF5//:components/ble/ble_db_discovery/ble_db_discovery.c",
         "@nRF5//:components/ble/ble_services/ble_ancs_c/ancs_app_attr_get.c",
