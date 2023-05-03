@@ -240,7 +240,7 @@ void ui_add_notification(char *appid, char *title, char *msg) {
     // Try to find the icon for the given app
     auto it = icons.find(appid);
     if (it != icons.end()) {
-        icon = it->second;
+        icon = it->second.data;
         frame.origin.y -= 60;
         frame.height += 60;
     }

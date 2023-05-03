@@ -1,6 +1,14 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_gazelle//:deps.bzl", "go_repository")
 
 def icons_deps():
+    # gohex package
+    go_repository(
+        name = "com_github_marcinbor85_gohex",
+        importpath = "github.com/marcinbor85/gohex",
+        commit = "55fb1c624d845f0f5b79ee946cf09a15cb50ed89",
+    )
+
     # Wallet Icon
     http_file(
         name = "com.apple.Passbook_icon",
@@ -59,4 +67,16 @@ def icons_deps():
     http_file(
         name = "ph.telegra.Telegraph_icon",
         urls = ["https://is5-ssl.mzstatic.com/image/thumb/Purple114/v4/fa/0d/a5/fa0da5b5-ef54-6669-b252-696851ffca7c/source/60x60bb.png"],
+    )
+
+    # Pushover Icon
+    http_file(
+        name = "net.superblock.Pushover_icon",
+        urls = ["https://is2-ssl.mzstatic.com/image/thumb/Purple112/v4/df/08/b1/df08b10d-9437-d4ab-6445-10fd82753bae/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/60x60bb.png"],
+    )
+
+    # BeReal Icon
+    http_file(
+        name = "AlexisBarreyat.BeReal_icon",
+        urls = ["https://is4-ssl.mzstatic.com/image/thumb/Purple116/v4/dc/ad/60/dcad60f1-6aa3-78b1-32fe-91d20fb29bfb/AppIcon-1x_U007emarketing-0-5-0-85-220.png/60x60bb.jpg"],
     )

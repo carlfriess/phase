@@ -6,9 +6,15 @@
 #define PHASE_ICONS_H
 
 #include <cstdint>
+#include <cstddef>
 #include <map>
 #include <string>
 
-extern const std::map<const std::string, const uint8_t *> icons;
+struct icon_meta {
+    const uint8_t *data;
+    size_t width, height;
+};
+
+extern const std::map<const std::string, struct icon_meta> icons;
 
 #endif //PHASE_ICONS_H

@@ -4,7 +4,7 @@
 set -e
 
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <hex-file>"
+    echo "Usage: $0 <hex-file>[ <qspi-hex-file>]"
     exit 1
 fi
 
@@ -27,3 +27,7 @@ if [ ! -f "$NRFJPROG" ]; then
 fi
 
 $NRFJPROG --program $1 --chiperase --reset
+
+if [ "$#" -ge 2 ]; then
+  $NRFJPROG --qspiini tools/QspiConfig.ini --program $2 --qspisectorerase --reset
+fi
