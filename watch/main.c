@@ -8,6 +8,7 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_twi_mngr.h"
 #include "nrfx_gpiote.h"
+#include "nrfx_qspi.h"
 #include "sdk_config.h"
 
 #include "GC9A01.h"
@@ -73,6 +74,56 @@ static void time_sync_handler(void *ctx) {
     bluetooth_request_time();
 }
 
+static void qspi_flash_init() {
+
+    ret_code_t err;
+    uint32_t buf = 0;
+    nrf_qspi_cinstr_conf_t cinstr_cfg = {
+            .io2_level = true,
+            .io3_level = true,
+            .wipwait   = true,
+            .wren      = true
+    };
+
+    // Initialize peripheral
+    nrfx_qspi_config_t config = NRFX_QSPI_DEFAULT_CONFIG;
+    err = nrfx_qspi_init(&config, NULL, NULL);
+    APP_ERROR_CHECK(err);
+
+    // Enable Reset command
+    cinstr_cfg.opcode = 0x66;
+    cinstr_cfg.length = NRF_QSPI_CINSTR_LEN_1B;
+    err = nrfx_qspi_cinstr_xfer(&cinstr_cfg, NULL, NULL);
+    APP_ERROR_CHECK(err);
+
+    // Reset Device command
+    cinstr_cfg.opcode = 0x99;
+    cinstr_cfg.length = NRF_QSPI_CINSTR_LEN_1B;
+    err = nrfx_qspi_cinstr_xfer(&cinstr_cfg, NULL, NULL);
+    APP_ERROR_CHECK(err);
+
+    // Read JEDEC ID command
+    cinstr_cfg.opcode = 0x9F;
+    cinstr_cfg.length = NRF_QSPI_CINSTR_LEN_4B;
+    err = nrfx_qspi_cinstr_xfer(&cinstr_cfg, &buf, &buf);
+    APP_ERROR_CHECK(err);
+    NRF_LOG_INFO("Flash JEDEC: %lx", buf);
+
+    // Write Enable
+    // cinstr_cfg.opcode = 0x06;
+    // cinstr_cfg.length = NRF_QSPI_CINSTR_LEN_1B;
+    // err = nrfx_qspi_cinstr_xfer(&cinstr_cfg, NULL, NULL);
+    // APP_ERROR_CHECK(err);
+
+    // Set Quad Enable (QE) bit using Status Register Write-2 command
+    buf = 0x02;
+    cinstr_cfg.opcode = 0x31;
+    cinstr_cfg.length = NRF_QSPI_CINSTR_LEN_2B;
+    err = nrfx_qspi_cinstr_xfer(&cinstr_cfg, &buf, &buf);
+    APP_ERROR_CHECK(err);
+
+}
+
 int main(void) {
 
     ret_code_t err;
@@ -96,6 +147,9 @@ int main(void) {
     // Initialize GPIO tasks & events module
     err = nrfx_gpiote_init();
     APP_ERROR_CHECK(err);
+
+    // Initialize QSPI flash
+    qspi_flash_init();
 
     // Initialize board power module
     power_init(CHG_STATUS);

@@ -96,6 +96,7 @@ nRF5_binary(
         "@nRF5//:modules/nrfx/drivers/src/nrfx_clock.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_gpiote.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_ppi.c",
+        "@nRF5//:modules/nrfx/drivers/src/nrfx_qspi.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_saadc.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_spi.c",
         "@nRF5//:modules/nrfx/drivers/src/nrfx_spim.c",
