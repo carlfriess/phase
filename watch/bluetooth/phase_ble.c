@@ -23,8 +23,8 @@
 #define APP_BLE_OBSERVER_PRIO   3       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 
 #define APP_ADV_FAST_INTERVAL   0x0028  /**< Fast advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
-#define APP_ADV_SLOW_INTERVAL   0x0C80  /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
-#define APP_ADV_FAST_DURATION   3000    /**< The advertising duration of fast advertising in units of 10 milliseconds. */
+#define APP_ADV_SLOW_INTERVAL   0x00A0  /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
+#define APP_ADV_FAST_DURATION   6000   /**< The advertising duration of fast advertising in units of 10 milliseconds. */
 #define APP_ADV_SLOW_DURATION   0       /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
 
