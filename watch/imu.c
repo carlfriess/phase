@@ -105,7 +105,7 @@ static int8_t bmi2_set_config(struct bmi2_dev *dev) {
     if (res != BMI2_OK) return res;
 
     // Configure wrist gesture feature
-    config[1].cfg.wrist_gest.wearable_arm = BMI2_ARM_RIGHT;
+    config[1].cfg.wrist_gest.wearable_arm = BMI2_ARM_LEFT;
 
     // Set the new configuration
     res = bmi270_set_sensor_config(config, 2, dev);
