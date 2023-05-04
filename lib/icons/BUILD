@@ -52,6 +52,22 @@ icons = [
         "name": "AlexisBarreyat.BeReal",
         "img": "@AlexisBarreyat.BeReal_icon//file",
     },
+    {
+        "name": "com.hammerandchisel.discord",
+        "img": "@com.hammerandchisel.discord_icon//file",
+    },
+    {
+        "name": "com.mattermost.rn",
+        "img": "@com.mattermost.rn_icon//file",
+    },
+    {
+        "name": "uk.co.bbc.news",
+        "img": "@uk.co.bbc.news_icon//file",
+    },
+    {
+        "name": "com.apnews.ipad.mobilenewsdevel",
+        "img": "@com.apnews.ipad.mobilenewsdevel_icon//file",
+    },
 ]
 
 embed_hex(

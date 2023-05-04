@@ -78,5 +78,29 @@ def icons_deps():
     # BeReal Icon
     http_file(
         name = "AlexisBarreyat.BeReal_icon",
-        urls = ["https://is4-ssl.mzstatic.com/image/thumb/Purple116/v4/dc/ad/60/dcad60f1-6aa3-78b1-32fe-91d20fb29bfb/AppIcon-1x_U007emarketing-0-5-0-85-220.png/60x60bb.jpg"],
+        urls = ["https://is4-ssl.mzstatic.com/image/thumb/Purple116/v4/dc/ad/60/dcad60f1-6aa3-78b1-32fe-91d20fb29bfb/AppIcon-1x_U007emarketing-0-5-0-85-220.png/60x60bb.png"],
+    )
+
+    # Discord Icon
+    http_file(
+        name = "com.hammerandchisel.discord_icon",
+        urls = ["https://is4-ssl.mzstatic.com/image/thumb/Purple116/v4/45/d7/d2/45d7d2b7-dcd4-bfcb-911a-180bbc8bb100/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/60x60bb.png"],
+    )
+
+    # Mattermost Icon
+    http_file(
+        name = "com.mattermost.rn_icon",
+        urls = ["https://is5-ssl.mzstatic.com/image/thumb/Purple126/v4/af/60/6d/af606db3-7fd6-75a8-66a4-e5a967dc130b/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/60x60bb.png"],
+    )
+
+    # BBC News Icon
+    http_file(
+        name = "uk.co.bbc.news_icon",
+        urls = ["https://is3-ssl.mzstatic.com/image/thumb/Purple112/v4/31/17/79/311779d6-bfe8-d8d5-4782-81bd4c5f01ea/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/60x60bb.png"],
+    )
+
+    # AP News Icon
+    http_file(
+        name = "com.apnews.ipad.mobilenewsdevel_icon",
+        urls = ["https://is2-ssl.mzstatic.com/image/thumb/Purple116/v4/60/25/25/60252502-cef3-16d2-6900-b7abeb9fe0c6/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/60x60bb.png"],
     )
